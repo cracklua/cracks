@@ -1,0 +1,7 @@
+local texts, = {}, 
+    for _, child in ipairs(game.Players.LocalPlayer.PlayerGui.ScreenGui.Background.BottomBar.Output.ScrollingFrame:GetChildren()) do
+        if child:IsA("TextBox") then
+            texts[#texts+1] = child.Text
+   end
+end
+setclipboard(table.concat(texts, "\n"))
