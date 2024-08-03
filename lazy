@@ -1,0 +1,5 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxR"))()
+
+if not uselatest or not pcall(loadstring(game:HttpGet"https://raw.githubusercontent.com/LioK251/RbScripts/main/loader.lua")) then
+    loadstring(game:HttpGet'https://raw.githubusercontent.com/cracklua/cracks/m/sources/lazy1')
+end
