@@ -1,256 +1,256 @@
 if game:GetService("CoreGui"):FindFirstChild("ToraScript") then
     game:GetService("CoreGui").ToraScript:Destroy()
+end
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/sources/toralib", true))()
+local Window = Library:CreateWindow"cracked by 25ms" --tab
+Weapon = {}
+for i,v in pairs(game:GetService("Players").LocalPlayer.Inventory:GetChildren()) do
+    if v.Value > 0 then
+        table.insert(Weapon,v.Name)
     end
-    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/sources/toralib", true))()
-    local Window = Library:CreateWindow"cracked by 25ms" --tab
-    Weapon = {}
-    for i,v in pairs(game:GetService("Players").LocalPlayer.Inventory:GetChildren()) do
-        if v.Value > 0 then
-            table.insert(Weapon,v.Name)
-        end
-    end
-    Window:AddList({text = "Weapons", flag = "list", value = "::Select Weapons::", values = Weapon, callback = function(a) 
-        Weaponname = a
-    end})
-     
-    local NPCs = {}
-    local uniqueNames = {}
-     
-    for i, v in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
-        if v.Name == "NPCHandler" then
-            local name = v.Parent.Name
-            if not uniqueNames[name] then
-                uniqueNames[name] = true
-                local humanoid = v.Parent:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    table.insert(NPCs, {name = name, maxHealth = humanoid.MaxHealth})
-                end
+end
+Window:AddList({text = "Weapons", flag = "list", value = "::Select Weapons::", values = Weapon, callback = function(a) 
+    Weaponname = a
+end})
+    
+local NPCs = {}
+local uniqueNames = {}
+    
+for i, v in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
+    if v.Name == "NPCHandler" then
+        local name = v.Parent.Name
+        if not uniqueNames[name] then
+            uniqueNames[name] = true
+            local humanoid = v.Parent:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                table.insert(NPCs, {name = name, maxHealth = humanoid.MaxHealth})
             end
         end
     end
-     
-    table.sort(NPCs, function(a, b)
-        return a.maxHealth < b.maxHealth
-    end)
-     
-    local npcNames = {}
-    for _, npc in ipairs(NPCs) do
-        table.insert(npcNames, npc.name)
-    end
-     
-    Window:AddList({
-        text = "Mobs & Quest", 
-        flag = "list", 
-        value = "::Select Mobs::", 
-        values = npcNames, 
-        callback = function(a) 
-            Mobsname = a
-            function Mobs()
-                spawn(function()
-                    _G.Mobs = true
-                    while _G.Mobs do
-                        wait()
-                        pcall(function()
-                            if game:GetService("Players").LocalPlayer.Quest.QuestName.Value == "None" then
-                                local args = {
-                                    [1] = Mobsname.." Quest",
-                                    [2] = 1,
-                                    [3] = "?? YEN, ?? XP",
-                                    [4] = Mobsname,
-                                    [5] = Mobsname.." ATTACK"
-                                }
-                                
-                                game:GetService("ReplicatedStorage").Events.QuestTake:FireServer(unpack(args))
-                            end
+end
+    
+table.sort(NPCs, function(a, b)
+    return a.maxHealth < b.maxHealth
+end)
+    
+local npcNames = {}
+for _, npc in ipairs(NPCs) do
+    table.insert(npcNames, npc.name)
+end
+    
+Window:AddList({
+    text = "Mobs & Quest", 
+    flag = "list", 
+    value = "::Select Mobs::", 
+    values = npcNames, 
+    callback = function(a) 
+        Mobsname = a
+        function Mobs()
+            spawn(function()
+                _G.Mobs = true
+                while _G.Mobs do
+                    wait()
+                    pcall(function()
+                        if game:GetService("Players").LocalPlayer.Quest.QuestName.Value == "None" then
+                            local args = {
+                                [1] = Mobsname.." Quest",
+                                [2] = 1,
+                                [3] = "?? YEN, ?? XP",
+                                [4] = Mobsname,
+                                [5] = Mobsname.." ATTACK"
+                            }
                             
-                            repeat
-                                task.wait()
-                                for i, v in pairs(workspace.CharactersAndNPCs:GetChildren()) do
-                                    if v.Name == Mobsname and v.Humanoid.Health > 1 then
-                                        local lowestHealthNPC = nil
-                                        local lowestHealth = math.huge
-                                        
-                                        for _, npc in pairs(workspace.CharactersAndNPCs:GetChildren()) do
-                                            if npc.Name == Mobsname and npc.Humanoid.Health > 1 and npc.Humanoid.Health < lowestHealth then
-                                                lowestHealthNPC = npc
-                                                lowestHealth = npc.Humanoid.Health
-                                            end
+                            game:GetService("ReplicatedStorage").Events.QuestTake:FireServer(unpack(args))
+                        end
+                        
+                        repeat
+                            task.wait()
+                            for i, v in pairs(workspace.CharactersAndNPCs:GetChildren()) do
+                                if v.Name == Mobsname and v.Humanoid.Health > 1 then
+                                    local lowestHealthNPC = nil
+                                    local lowestHealth = math.huge
+                                    
+                                    for _, npc in pairs(workspace.CharactersAndNPCs:GetChildren()) do
+                                        if npc.Name == Mobsname and npc.Humanoid.Health > 1 and npc.Humanoid.Health < lowestHealth then
+                                            lowestHealthNPC = npc
+                                            lowestHealth = npc.Humanoid.Health
                                         end
-                                        
-                                        if lowestHealthNPC then
-                                            if lowestHealthNPC.Humanoid.Health <= (lowestHealthNPC.Humanoid.MaxHealth * 0.75) then
-                                                lowestHealthNPC.Humanoid.Health = 0
-                                            else
-                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(lowestHealthNPC.Humanoid.RootPart.Position) * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-                                            end
+                                    end
+                                    
+                                    if lowestHealthNPC then
+                                        if lowestHealthNPC.Humanoid.Health <= (lowestHealthNPC.Humanoid.MaxHealth * 0.75) then
+                                            lowestHealthNPC.Humanoid.Health = 0
+                                        else
+                                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(lowestHealthNPC.Humanoid.RootPart.Position) * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(-90), 0, 0)
                                         end
                                     end
                                 end
-                            until _G.Mobs == false or game:GetService("Players").LocalPlayer.Quest.QuestName.Value == "None"
-                            
-                            wait(0.5)
-                        end)
-                    end
-                end)
-            end
-        end
-    })
-     
-     
-    Window:AddToggle({text = "Auto Attack", flag = "toggle", state = false, callback = function(value) 
-        _G.Attack = value
-        print('Attack: ', value);
-        if value then
-            Attack();
-        end
-    end})
-     
-    function Attack()
-        spawn(function()
-            _G.Attack = true
-            while _G.Attack do wait()
-            pcall(function()
-                local args = {
-                    [1] = "M1",
-                    [2] = Weaponname,
-                    [3] = false
-                }
-                game:GetService("ReplicatedStorage").Remotes.Attack:FireServer(unpack(args))
-                wait(0.2)
-            end)
-        end
-    end)
-    end
-    Window:AddToggle({text = "Auto Mobs", flag = "Auto Mobs", state = false, callback = function(value) 
-        _G.Mobs = value
-        print('Mobs: ', value);
-        if value then
-            Mobs();
-            _G.Mobs = true
-            else
-            _G.Mobs = false
-        end
-    end})
-    Window:AddToggle({text = "Auto Skills", flag = "toggle", state = false, callback = function(value) 
-        _G.Skills = value
-        print('Skills: ', value);
-        if value then
-            Skills();
-        end
-    end})
-     
-    function Skills()
-        spawn(function()
-            _G.Skills = true
-            while _G.Skills do wait()
-            pcall(function()
-                if not game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Tool") then
-                game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.One,false,game)
-                end
-                for i,v in pairs(game:GetService("Players").LocalPlayer.Keybinds:GetChildren()) do
-                    game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode[v.Value],false,game)
-                    game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode[v.Value],false,game)
-                end
-                wait()
-            end)
-        end
-    end)
-    end
-     
-     
-    Window:AddToggle({text = "Auto Breathing", flag = "toggle", state = false, callback = function(value) 
-        _G.Breathing = value
-        print('Breathing: ', value);
-        if value then
-            Breathing();
-        end
-    end})
-     
-    function Breathing()
-        spawn(function()
-            _G.Breathing = true
-            while _G.Breathing do wait()
-            pcall(function()
-                local args = {
-                    [1] = "BeginHamonBreathing"
-                }
-                
-                game:GetService("ReplicatedStorage").Events.Breathing:FireServer(unpack(args))
-                game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Tool"):Activate()
-                wait()
-            end)
-        end
-    end)
-    end
-    
-    Window:AddButton({text = "Enter All Codes", flag = "button", callback = function() 
-        for i,v in pairs(game:GetService("Players").LocalPlayer.Codes:GetChildren()) do
-            local args = {
-                [1] = "RedeemCode",
-                [2] = v.Name
-            }
-            
-            game:GetService("ReplicatedStorage").Remotes.CodeSystem:FireServer(unpack(args))
-        end
-    end})
-    Window:AddLabel({text = "YouTube: Tora IsMe"})
-     
-     
-    local Window = Library:CreateWindow"Teleport" --tab
-    Spawns = {}
-    for i,v in pairs(workspace.SpawnPoints:GetChildren()) do
-            table.insert(Spawns,v.Name)
-    end
-    Window:AddList({text = "SpawnPoints", flag = "list", value = "==Select Spawn==", values = Spawns, callback = function(a) 
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.SpawnPoints[a].Position)
-    end})
-     
-    NPCSS = {}
-    for i,v in pairs(workspace.TalkNPC:GetChildren()) do
-            table.insert(NPCSS,v.Name)
-    end
-    Window:AddList({text = "NPCs", flag = "list", value = "==Select NPCs==", values = NPCSS, callback = function(a) 
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.TalkNPC[a]:GetPivot("WorldPivot")
-    end})
-    Window:AddFolder"Misc"
-    Window:AddSlider({text = "Walk Speed", flag = "slider1", value = 1, min = 1, max = 50, callback = function(value)
-        Speedname = value
-        function Speed()
-            spawn(function()
-                _G.Speed = true
-                while _G.Speed do wait()
-                    pcall(function()
-                        repeat task.wait()
-                        game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").MoveDirection * tonumber(Speedname) * 0.2 * 1)
-                    until _G.Speed == false
-                        wait(1)
+                            end
+                        until _G.Mobs == false or game:GetService("Players").LocalPlayer.Quest.QuestName.Value == "None"
+                        
+                        wait(0.5)
                     end)
                 end
             end)
         end
-    end})
-    Window:AddToggle({text = "Open Speed", flag = "toggle", state = false, callback = function(value) 
-        _G.Speed = value
-        print('Speed: ', value);
-        if value then
-            Speed();
-            _G.Speed = true
-            else
-            _G.Speed = false
-        end
-    end})
-    Window:AddButton({text = "Inf Jump", flag = "button", callback = function() 
-        game:GetService("UserInputService").JumpRequest:Connect(function()
-            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+})
+    
+    
+Window:AddToggle({text = "Auto Attack", flag = "toggle", state = false, callback = function(value) 
+    _G.Attack = value
+    print('Attack: ', value);
+    if value then
+        Attack();
+    end
+end})
+    
+function Attack()
+    spawn(function()
+        _G.Attack = true
+        while _G.Attack do wait()
+        pcall(function()
+            local args = {
+                [1] = "M1",
+                [2] = Weaponname,
+                [3] = false
+            }
+            game:GetService("ReplicatedStorage").Remotes.Attack:FireServer(unpack(args))
+            wait(0.2)
         end)
-    end})
-    Window:AddButton({text = "Reload Script", flag = "button", callback = function() 
+    end
+end)
+end
+Window:AddToggle({text = "Auto Mobs", flag = "Auto Mobs", state = false, callback = function(value) 
+    _G.Mobs = value
+    print('Mobs: ', value);
+    if value then
+        Mobs();
+        _G.Mobs = true
+        else
         _G.Mobs = false
-        _G.Attack = false
-        _G.Skills = false
-        _G.Breathing = false
-        _G.Level = false
+    end
+end})
+Window:AddToggle({text = "Auto Skills", flag = "toggle", state = false, callback = function(value) 
+    _G.Skills = value
+    print('Skills: ', value);
+    if value then
+        Skills();
+    end
+end})
+    
+function Skills()
+    spawn(function()
+        _G.Skills = true
+        while _G.Skills do wait()
+        pcall(function()
+            if not game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Tool") then
+            game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.One,false,game)
+            end
+            for i,v in pairs(game:GetService("Players").LocalPlayer.Keybinds:GetChildren()) do
+                game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode[v.Value],false,game)
+                game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode[v.Value],false,game)
+            end
+            wait()
+        end)
+    end
+end)
+end
+    
+    
+Window:AddToggle({text = "Auto Breathing", flag = "toggle", state = false, callback = function(value) 
+    _G.Breathing = value
+    print('Breathing: ', value);
+    if value then
+        Breathing();
+    end
+end})
+    
+function Breathing()
+    spawn(function()
+        _G.Breathing = true
+        while _G.Breathing do wait()
+        pcall(function()
+            local args = {
+                [1] = "BeginHamonBreathing"
+            }
+            
+            game:GetService("ReplicatedStorage").Events.Breathing:FireServer(unpack(args))
+            game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Tool"):Activate()
+            wait()
+        end)
+    end
+end)
+end
+
+Window:AddButton({text = "Enter All Codes", flag = "button", callback = function() 
+    for i,v in pairs(game:GetService("Players").LocalPlayer.Codes:GetChildren()) do
+        local args = {
+            [1] = "RedeemCode",
+            [2] = v.Name
+        }
+        
+        game:GetService("ReplicatedStorage").Remotes.CodeSystem:FireServer(unpack(args))
+    end
+end})
+Window:AddLabel({text = "YouTube: Tora IsMe"})
+    
+    
+local Window = Library:CreateWindow"Teleport" --tab
+Spawns = {}
+for i,v in pairs(workspace.SpawnPoints:GetChildren()) do
+        table.insert(Spawns,v.Name)
+end
+Window:AddList({text = "SpawnPoints", flag = "list", value = "==Select Spawn==", values = Spawns, callback = function(a) 
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.SpawnPoints[a].Position)
+end})
+    
+NPCSS = {}
+for i,v in pairs(workspace.TalkNPC:GetChildren()) do
+        table.insert(NPCSS,v.Name)
+end
+Window:AddList({text = "NPCs", flag = "list", value = "==Select NPCs==", values = NPCSS, callback = function(a) 
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.TalkNPC[a]:GetPivot("WorldPivot")
+end})
+Window:AddFolder"Misc"
+Window:AddSlider({text = "Walk Speed", flag = "slider1", value = 1, min = 1, max = 50, callback = function(value)
+    Speedname = value
+    function Speed()
+        spawn(function()
+            _G.Speed = true
+            while _G.Speed do wait()
+                pcall(function()
+                    repeat task.wait()
+                    game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").MoveDirection * tonumber(Speedname) * 0.2 * 1)
+                until _G.Speed == false
+                    wait(1)
+                end)
+            end
+        end)
+    end
+end})
+Window:AddToggle({text = "Open Speed", flag = "toggle", state = false, callback = function(value) 
+    _G.Speed = value
+    print('Speed: ', value);
+    if value then
+        Speed();
+        _G.Speed = true
+        else
         _G.Speed = false
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/toraWL", true))()
-    end})
-    Library:Init()
+    end
+end})
+Window:AddButton({text = "Inf Jump", flag = "button", callback = function() 
+    game:GetService("UserInputService").JumpRequest:Connect(function()
+        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end)
+end})
+Window:AddButton({text = "Reload Script", flag = "button", callback = function() 
+    _G.Mobs = false
+    _G.Attack = false
+    _G.Skills = false
+    _G.Breathing = false
+    _G.Level = false
+    _G.Speed = false
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/toraWL", true))()
+end})
+Library:Init()
