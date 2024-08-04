@@ -193,7 +193,8 @@ Window:AddButton({text = "Enter All Codes", flag = "button", callback = function
         game:GetService("ReplicatedStorage").Remotes.CodeSystem:FireServer(unpack(args))
     end
 end})
-Window:AddLabel({text = "YouTube: Tora IsMe"})
+Window:AddButton({text="Copy inv for more cracks",callback=function()setclipboard("https://discord.gg/veyCrM4vnn")end})
+Window:AddLabel({text = "discord.gg/veyCrM4vnn"})
     
     
 local Window = Library:CreateWindow"Teleport" --tab
