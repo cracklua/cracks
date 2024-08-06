@@ -1,6 +1,4 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxR"))()
 local oldlds=loadstring
 getgenv().loadstring=function(txt) if txt:find("game.Players.LocalPlayer:Kick") or txt:find("--[[]]--") then return oldlds(game:HttpGet'https://raw.githubusercontent.com/cracklua/cracks/m/sources/fuckingmaterial.lua') end
-if not uselatest or not pcall(loadstring(game:HttpGet"https://raw.githubusercontent.com/LioK251/RbScripts/main/loader.lua")) then
-    loadstring(game:HttpGet'https://raw.githubusercontent.com/cracklua/cracks/m/sources/lazy1')()
-end
+loadstring(game:HttpGet'https://raw.githubusercontent.com/cracklua/cracks/m/sources/lazy1')()
