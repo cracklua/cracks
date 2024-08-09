@@ -277,10 +277,8 @@ function AddEnviroment()
 	local env = (getgenv and getgenv()) or getfenv(0)
 	for Name, Value in next, Options.enviroment do
 		if Options.OverrideFunctions or not env[Name] or table.find(forceoverride, Name) then
-			print("✅ Added",Name)
 			env[Name] = Value
         elseif env[Name] and not table.find(forceoverride, Name) and not Options.OverrideFunctions then
-            print("❌",Name,'already exists.')
         end
 	end
 end
