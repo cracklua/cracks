@@ -23,7 +23,12 @@ local games = {
     ["6174407103"] = "TitanTrainingSimulator",
     ["5747480325"] = "TongueBattles",
     ["5799867123"] = "UnknownRNG",
-    ["5567917599"] = "UnlimitedBattlegrounds"
+    ["5567917599"] = "UnlimitedBattlegrounds",
+    ["5954484868"] = "AnimeCrossoverDefence",
+    ["5521255650"] = "AnimeDestiny",
+    ["5675104029"] = "AnimeFantasyTD",
+    ["3525075510"] = "ProjectMugetsu",
+    ["6040823996"] = "ReXL",
 }
 
 local script_name = games[tostring(game.GameId)]
