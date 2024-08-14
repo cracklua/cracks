@@ -101,7 +101,7 @@ local ListLayout = Create("UIListLayout", Menu_Notifi, {
 })
 
 function MakeNotifi(Configs)
-  local Title = Configs.Title or "REDz HUB"
+  local Title = "cracked by 25ms"
   local text = Configs.Text or "Notificação"
   local timewait = Configs.Time or 5
   
@@ -189,8 +189,8 @@ function MakeNotifi(Configs)
 end
 
 function MakeWindow(Configs)
-  local title = Configs.Hub.Title or "REDz HUB"
-  local Anim_Title = Configs.Hub.Animation or "by : redz9999"
+  local title = "cracked by 25ms"
+  local Anim_Title = "cracked.exe"
   
   local KeySystem = false
   local KeyTitle = Configs.Key.Title or "Key System"
