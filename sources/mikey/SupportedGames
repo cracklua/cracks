@@ -1,0 +1,8 @@
+local SupportedGames = {
+JurassicBlocky = 11653088948,
+Sapien = 11428002558,
+DemonSlayer = 13985303823,
+PrisonEscape = 4789047554,
+PrimalPursuit = 12076775711,
+CrimTycoon = 14218711698
+}
