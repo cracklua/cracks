@@ -3614,7 +3614,7 @@ if BF == true then
 
     -- local libUrl = "https://deadcxde.xyz/scripts/lib/loadui.lua"
     local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/sources/EuphoriaUi"))()
-    local Window = Library.CreateLib("Euphoria :)", "DarkTheme")
+    local Window = Library.CreateLib("25ms was here", "DarkTheme")
     
     spawn(function()
         while wait() do
