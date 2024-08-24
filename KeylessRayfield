@@ -11,7 +11,7 @@ local ConfigurationExtension = ".rfld"
 
 
 local RayfieldLibrary = {
-	IntegrityCheckk=function()return true end
+	IntegrityCheckk=function()print'called int check';return true end,
 	Flags = {},
 	Theme = {
 		Default = {
