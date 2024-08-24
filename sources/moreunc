@@ -1187,3 +1187,4 @@ if not getgenv().MoreUNCV2 then
 	syn.protect_gui(DrawingUI)
 	syn.protect_gui(ClipboardUI)
 end
+print("loaded skibidi unc")
