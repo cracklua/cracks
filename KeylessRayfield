@@ -11,6 +11,7 @@ local ConfigurationExtension = ".rfld"
 
 
 local RayfieldLibrary = {
+	IntegrityCheckk=function()return true end
 	Flags = {},
 	Theme = {
 		Default = {
