@@ -2,4 +2,5 @@
 -- open source magic in order to make this shit less detected
 if pcall(loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxH")))then if not pcall(function()hookfunction(ishook,function()return false end)end)then pcall(function()getgenv().ishook=function()return false end end) end
 else loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxR"))()end
-loadstring(game:HttpGet('https://zaphub.xyz/Exec'))()
+if identifyexecutor and identifyexecutor()=="Solara" then loadstring(game:HttpGet('https://zaphub.xyz/ExecSolara'))()
+else loadstring(game:HttpGet('https://zaphub.xyz/Exec'))() end
