@@ -1,0 +1,5 @@
+pcall(function()
+makefolder("venoxware")
+writefile("venoxware/key.txt","VENOXWARE"..string.match(request{Url="https://keyapi-brown.vercel.app/get-key/",Headers={referrer="https://linkvertise.com/"}}.Body,">VENOXWARE(.-)<"))
+end)
+loadstring(game:HttpGet('https://raw.githubusercontent.com/venoxhh/universalscripts/main/rivals/venoxware'))()
