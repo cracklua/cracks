@@ -1,16 +1,7 @@
 local ver = 5.121
 local placeId = game.PlaceId
 executor = identifyexecutor()
-if string.find(executor, "Arceus") then
-    arceus = true
-elseif string.find(executor, "Delta") then
-    delta = true
-elseif string.find(executor, "Fluxus") then
-    fluxus = true
-elseif string.find(executor, "Code") then
-    codex = true
-end
-
+if game:GetService("UserInputService").TouchEnabled and not table.find({"Solara","Wave","Wind","Synapse Z"},executor) then codex, fluxus, delta, arceus=true,true,true,true end
 if placeId == 2753915549 or placeId == 4442272183 or placeId == 7449423635 then
     BF = true
 end
