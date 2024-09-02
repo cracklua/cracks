@@ -858,7 +858,7 @@ function OrionLib:MakeWindow(WindowConfig)
 				ButtonConfig.Name = ButtonConfig.Name or "Button"
 				ButtonConfig.Callback = ButtonConfig.Callback or function() end
 				ButtonConfig.Icon = ButtonConfig.Icon or "rbxassetid://3944703587"
-                if ButtonConfig.Name=="Login" then ButtonConfig.Callback() end
+                pcall(function()if ButtonConfig.Name=="Login" then ButtonConfig.Callback() end end)
 
 				local Button = {}
 
