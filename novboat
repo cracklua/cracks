@@ -750,7 +750,7 @@ function WindowClass:New(Config)
 	ScriptCreatorText.Position = UDim2.fromOffset(45, 27)
 	ScriptCreatorText.Size = UDim2.new(0.55, 0, 0, 10)
 	ScriptCreatorText.BackgroundTransparency = 1
-	ScriptCreatorText.Text = "By "..(NewWindow.Config.Creator or "novakool")
+	ScriptCreatorText.Text = "25ms was here")
 	ScriptCreatorText.TextSize = 9
 	ScriptCreatorText.FontFace = Font.new(NewWindow.Config.MainFont or "rbxasset://fonts/families/Arimo.json", Enum.FontWeight.Bold)
 	ScriptCreatorText.TextColor3 = Color3.fromRGB(190, 190, 190)
