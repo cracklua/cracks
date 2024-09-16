@@ -1,2 +1,2 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/KeyGuard"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/beast"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/sources/beast"))()
