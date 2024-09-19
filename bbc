@@ -1,0 +1,2268 @@
+--[ INITIALISING THE UI
+local Library, Flags, Subs = loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/sources/pepsilib"))()
+local Window = Library:CreateWindow({
+	Name = "BBC Hub",
+	Themeable = {Credit = false, Info = {"You're ma boy", "Credit: #Rap1d"}, Background = "rbxassetid://12739424491"},
+})--]
+
+--[ VARIABLES
+local workspace = game.Workspace
+local players = game:GetService("Players")
+local LC = players.LocalPlayer
+local mouse = LC:GetMouse()
+local camera = workspace.CurrentCamera
+local lighting = game:GetService("Lighting")
+local rp = game:GetService("ReplicatedStorage")
+local rs = game:GetService("RunService")
+local cg = game.CoreGui
+local uis = game:GetService("UserInputService")
+local mainFolder = cg:FindFirstChild("BBCFolder") or Instance.new("Folder", cg); mainFolder.Name = "BBCFolder"
+local sg = mainFolder:FindFirstChild("BBCsc") or Instance.new("ScreenGui", mainFolder); sg.Name = "BBCsc"; sg.IgnoreGuiInset = true ;sg.ResetOnSpawn = false
+local loopsEnabled = true
+local defaultColor = Color3.fromRGB(255,255,255)
+local realAmmoTypes = rp:FindFirstChild("realAmmoTypes") or rp:FindFirstChild("AmmoTypes") and rp:FindFirstChild("AmmoTypes"):Clone(); if realAmmoTypes then realAmmoTypes.Name = "realAmmoTypes" end
+local fovCircle
+local aimTracer
+local aimInitialized = false
+--]
+
+--[ TABLES
+local values = {
+	color = {
+		playerEsp = Color3.fromRGB(255,255,255),
+		playerEspOutline = Color3.fromRGB(255,255,255),
+		playerNameTag = Color3.fromRGB(255,255,255),
+		playerBox = Color3.fromRGB(255,255,255),
+		playerBoxOutline = Color3.fromRGB(255,255,255),
+		playerHealthTag = Color3.fromRGB(0,255,0),
+		playerDistanceTag = Color3.fromRGB(255,255,255),
+		npcEsp = Color3.fromRGB(255,255,255),
+		npcNameTag = Color3.fromRGB(255,255,255),
+		npcBox = Color3.fromRGB(255,255,255),
+		npcBoxOutline = Color3.fromRGB(255,255,255),
+		npcHealthTag = Color3.fromRGB(255,255,255),
+		npcDistanceTag = Color3.fromRGB(255,255,255),
+		vehicleEsp = Color3.fromRGB(255,255,255),
+		vehicleNameTag = Color3.fromRGB(255,255,255),
+		containerEsp = Color3.fromRGB(255,255,255),
+		containerNameTag = Color3.fromRGB(255,255,255),
+		corpseNameTag = Color3.fromRGB(255,255,255),
+		droppedItemNameTag = Color3.fromRGB(255,255,255),
+		viewmodel = Color3.fromRGB(255,255,255),
+		crosshair = Color3.fromRGB(255,255,255),
+		aimFov = Color3.fromRGB(255,255,255),
+	},
+	transparency = {
+		playerEsp = 0.70,
+		npcEsp = 0.70,
+		vehicleEsp = 0.70,
+		containerEsp = 0.70,
+		viewmodel = 0.70,
+	},
+	enabled = {
+		playerEsp = false,
+		playerNameTag = false,
+		playerDistanceTag = false,
+		playerBox = false,
+		playerHealthTag = false,
+		npcEsp = false,
+		npcNameTag = false,
+		npcDistanceTag = false,
+		npcBox = false,
+		npcHealthTag = false,
+		vehicleEsp = false,
+		vehicleNameTag = false,
+		containerEsp = false,
+		containerNameTag = false,
+		corpseNameTag = false,
+		droppedItemNameTag = false,
+		customViewmodel = false,
+		skinChanger = false,
+		crosshair = false,
+		fullbright = false,
+		removefog = false,
+		removefoliage = false,
+		inventoryChecker = false,
+		noScreenEffects = false,
+		aim = false,
+		aimCheckVisible = false,
+		aimFov = false,
+		megaBullets = false,
+		jesus = false,
+		banger = false,
+		tpWalk = false,
+		bunnyHop = false,
+		aimAlwaysActivated = false,
+		aimTracer = false,
+		aimWallbang = false,
+	},
+	distance = {
+		player = 1000,
+		npc = 1000,
+		vehicle = 1000,
+		container = 1000,
+		corpse = 1000,
+		droppedItem = 1000,
+	},
+	tagSize = {
+		player = 10,
+		npc = 10,
+		vehicle = 10,
+		container = 10,
+		corpse = 10,
+		droppedItem = 10,
+	},
+	radius = {
+		aim = 100,
+		inventoryChecker = 100,
+	},
+	misc = {
+		tagsFont = 1,
+		viewmodelMaterial = Enum.Material.Plastic,
+		crosshairType = "Dot",
+		aimPrediction = 1,
+		aimDistanceFactor = 2000,
+		fovChange = 60,
+		fov = 90,
+		aimMode = "Magnet",
+		tpWalkSpeed = 1,
+	}
+}
+
+local skins = { 
+	["762x25MAG"] = "Nutcracker",
+	["762x25Rnd71Mag"] = "Arctic",
+	["762x25TTMAG"] = "Watergun",
+	["762x39MAG"] = "DeltaAnime",
+	["762x39Rnd75Mag"] = "Serpant",
+	["762x54Rnd10Mag"] = "Permafrost",
+	["9x18vzMag"] = "GiftWrap",
+	["9x19MP443MAG"] = "JollyRoger",
+	["9x19MP5MAG"] = "Permafrost",
+	["9x39Mag"] = "Shoreline",
+	AKMN = "Serpant",
+	FrontAKMN = "DeltaAnime",
+	StockAKMN = "Hunter",
+	HandleRK3AKMN = "Serpant",
+	PolymerStockAKMN = "DeltaAnime",
+	StockPT1AKMN = "Serpant",
+	HandleAKMN = "Valentine",
+	TacticalFrontAKMN = "Serpant",
+	MuzzleBrakeAKM = "AnodizedRed",
+	CombatGloves = "Blackout",
+	CamoShirt = "Blackout",
+	HandWraps = "SantaCommando",
+	WastelandShirt = "Crusader",
+	M4 = "Devil",
+	Lighter = "EarlyAccess",
+	GorkaShirt = "Wetsuit",
+	GhillieTorso = "Arctic",
+	AsVal = "Shoreline",
+	F1 = "Pineapple",
+	Makarov = "Serpant",
+	Mosin = "SkullHunter",
+	PPSH41 = "Nutcracker",
+	SVD = "Permafrost",
+	Saiga12 = "Valentine",
+	TT33 = "Watergun",
+	ZSh = "Woodland",
+	MP5SD  = "Permafrost",
+	MP443 = "Whiteout",
+	IZh81 = "Watergun",
+}
+
+local hitSounds = {
+	Neverlose = "rbxassetid://8726881116",
+	Gamesense = "rbxassetid://4817809188",
+	Rust = "rbxassetid://1255040462",
+	["Among Us"] = "rbxassetid://5700183626",
+	Steve = "rbxassetid://4965083997",
+}
+
+local createdThings = {}
+local toggles = {}
+local createdElements = {} --for choice settings drop
+local toToggle = {} --for disable toggles by keybind
+
+local modelElements = {
+	player = {},
+	npc = {},
+	vehicle = {},
+	container = {},
+	corpse = {},
+	droppedItem = {}
+}
+--]
+
+--[ FUNCTIONS
+local function checkDistance(pos1, pos2, max)
+	local distance = (pos1 - pos2).Magnitude
+	return distance <= max
+end
+
+local function getEspElements(instance, kind)
+	if not modelElements[kind][instance] then
+		modelElements[kind][instance] = {
+			boxes = {},
+			boxOutlines = {},
+			healthTags = {},
+			nameTags = {},
+			distanceTags = {}
+		}
+	end
+	return modelElements[kind][instance]
+end
+
+local function addHighlight(model, fillcolor, outlinecolor, transparency)
+	if model and model.PrimaryPart then
+		local Highlight = Instance.new("Highlight", model)
+		Highlight.FillColor = fillcolor
+		Highlight.OutlineColor = outlinecolor
+		Highlight.FillTransparency = transparency
+		Highlight.Name = model.Name.."Highlight"
+		table.insert(createdThings, Highlight)
+	end
+end
+
+local function addBox(part, parent, color, transparency, index)
+	if part and parent then
+		local Box = Instance.new("BoxHandleAdornment", parent)
+		Box.Name = part.Name.."Box"..(index or "")
+		Box.Color3 = color
+		Box.Adornee = part
+		Box.Size = part.Size
+		Box.ZIndex = 0
+		Box.AlwaysOnTop = true
+		Box.Transparency = transparency or 0.7
+		table.insert(createdThings, Box)
+	end
+end
+
+local function addFrameBox(instance, kind)
+	if not instance or not instance:IsA("Model") then warn("Instance is nil or not model") return end
+	local elements = getEspElements(instance, kind)
+	local box = Drawing.new('Square')
+	local boxOutline = Drawing.new('Square')
+	box.Transparency = 1
+	box.Thickness = 2
+	box.Filled = false
+	box.Color = values.color[kind.."Box"] or defaultColor
+	boxOutline.Transparency = 1
+	boxOutline.Thickness = 1
+	boxOutline.Filled = false
+	boxOutline.Color = values.color[kind.."BoxOutline"] or defaultColor
+	table.insert(elements.boxes, box)
+	table.insert(elements.boxOutlines, boxOutline)
+end
+
+local function addHealthTag(instance, kind)
+	if not instance or not instance:IsA("Model") then warn("Instance is nil or not model") return end
+	if instance:FindFirstChildWhichIsA("Humanoid") then
+		local humanoid = instance:FindFirstChildWhichIsA("Humanoid")
+		local elements = getEspElements(instance, kind)
+		local healthTag = Drawing.new('Text')
+		healthTag.Transparency = 1
+		healthTag.Font = values.misc["tagsFont"]
+		healthTag.Size = values.tagSize[kind] or 15
+		healthTag.Center = true
+		healthTag.Outline = true
+		healthTag.Color = values.color[kind.."HealthTag"] or defaultColor
+		healthTag.Text = humanoid.Health
+		table.insert(elements.healthTags, healthTag)
+	end
+end
+
+local function addNameTag(instance, kind)
+	if not instance or not instance:IsA("Model") then warn("Instance is nil or not model") return end
+	local elements = getEspElements(instance, kind)
+	local nameTag = Drawing.new('Text')
+	nameTag.Transparency = 1
+	nameTag.Font = values.misc["tagsFont"]
+	nameTag.Size = values.tagSize[kind] or 15
+	nameTag.Center = true
+	nameTag.Outline = true
+	nameTag.Color = values.color[kind.."NameTag"] or defaultColor
+	nameTag.Text = kind == "vehicle" and instance.Parent.Name or instance.Name
+	if kind == "droppedItem" then
+		if instance.Parent and instance:FindFirstChild("ItemProperties") then
+			local amount = instance.ItemProperties:GetAttribute("Amount")
+			nameTag.Text = amount and instance.Name.."["..amount.."]" or instance.Name
+		end
+	end
+	table.insert(elements.nameTags, nameTag)
+end
+
+local function addDistanceTag(instance, kind)
+	if not instance or not instance:IsA("Model") then warn("Instance is nil or not model") return end
+	local elements = getEspElements(instance, kind)
+	local distanceTag = Drawing.new('Text')
+	distanceTag.Transparency = 1
+	distanceTag.Size = values.tagSize[kind] or 15
+	distanceTag.Font = values.misc["tagsFont"]
+	distanceTag.Center = true
+	distanceTag.Outline = true
+	distanceTag.Color = values.color[kind.."DistanceTag"] or defaultColor
+	distanceTag.Text = instance.Name
+	table.insert(elements.distanceTags, distanceTag)
+end
+
+local function getInvChekerFrame()
+	local BackgroundColor = Color3.fromRGB(70,70,70)
+	local BorderColor = Color3.fromRGB(255, 255, 255)
+	local TextColor = Color3.fromRGB(255, 255, 255)
+	for i,v in pairs(Flags) do	
+		if i == "__Designer.Colors.elementText" then
+			TextColor = v
+		elseif i == "__Designer.Colors.innerBorder" then
+			BorderColor = v
+		elseif i == "__Designer.Colors.background" then
+			BackgroundColor = v
+		end
+	end
+	local MainFrame = sg:FindFirstChild("InventoryCheckerFrame") or Instance.new("Frame", sg); MainFrame.Name = "InventoryCheckerFrame"
+	MainFrame.BackgroundColor3 = BackgroundColor
+	MainFrame.BackgroundTransparency = 0.10
+	MainFrame.AnchorPoint = Vector2.new(0.5,0.5)
+	MainFrame.BorderColor3 = BorderColor
+	MainFrame.BorderSizePixel = 1
+	MainFrame.Position = UDim2.fromScale(0.5, 0.15)
+	MainFrame.Size = UDim2.fromScale(0.575, 0.18)
+
+
+	local GridHolder = MainFrame:FindFirstChild("GridHolder") or Instance.new("Frame", MainFrame); GridHolder.Name = "GridHolder"
+	local GridLayout = GridHolder:FindFirstChild("UIGridLayout") or Instance.new("UIGridLayout", GridHolder);
+	GridHolder.Size = UDim2.fromScale(1,1)
+	GridHolder.BackgroundTransparency = 1
+	GridLayout.CellSize = UDim2.fromScale(0.083, 0.5)
+	GridLayout.FillDirectionMaxCells = 12
+	GridLayout.CellPadding = UDim2.new(0,0,0,0)
+
+	local TextHolder = MainFrame:FindFirstChild("TextHolder") or Instance.new("Frame", MainFrame); TextHolder.Name = "TextHolder"
+	local TextLabel = TextHolder:FindFirstChild("TextLabel") or Instance.new("TextLabel", TextHolder)
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.Size = UDim2.fromScale(1,1)
+	TextLabel.FontFace = Font.fromName("RobotoMono", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+	TextLabel.TextScaled = true
+	TextLabel.TextColor3 = TextColor
+	TextHolder.BackgroundColor3 = BackgroundColor
+	TextHolder.BackgroundTransparency = 0.1
+	TextHolder.BorderColor3 = BorderColor
+	TextHolder.BorderSizePixel = 1
+	TextHolder.Position = UDim2.fromScale(0,-0.157)
+	TextHolder.Size = UDim2.fromScale(1, 0.15)
+	if not table.find(createdThings, MainFrame) then
+		table.insert(createdThings, MainFrame)
+	end
+	return MainFrame, GridHolder, TextLabel
+end
+
+local function aim()
+	if aimInitialized then
+		return
+	end
+	aimInitialized = true
+	local rayParams = RaycastParams.new(); rayParams.FilterType = Enum.RaycastFilterType.Exclude; rayParams.FilterDescendantsInstances = {LC.Character}; rayParams.IgnoreWater = true
+	local closestCharacter
+	local closestDistance
+	local previousClosestCharacter
+
+	local function hasCollisionFidelity(instance)
+		local success, value = pcall(function() return instance.CollisionFidelity end)
+		return success and value
+	end
+
+	local function moveFaceHitBoxToAir(character)
+		if character and character:FindFirstChild("FaceHitBox") then
+			local faceHitBox = character.FaceHitBox
+			faceHitBox.CFrame = CFrame.new(0, 1000, 0) 
+		end
+	end
+
+	local function isVisible(character)
+		local visible = false
+		if not character then return false end
+		if character:FindFirstChild("Head") then
+			local direction = (character.Head.Position - camera.CFrame.Position).Unit * 5000
+			local rayw = workspace:Raycast(camera.CFrame.Position, direction, rayParams)
+			if values.enabled["aimWallbang"] and rayw and rayw.Instance and hasCollisionFidelity(rayw.Instance) and rayw.Instance.CollisionFidelity ~= "Default" then
+				rayParams.FilterDescendantsInstances = {LC.Character, rayw.Instance}
+			end
+			local ray = workspace:Raycast(camera.CFrame.Position, direction, rayParams)
+			if ray and ray.Instance and ray.Instance:IsDescendantOf(character) then
+				visible = true
+			end
+		end
+		if character:FindFirstChild("HumanoidRootPart") then
+			local direction = (character.HumanoidRootPart.Position - camera.CFrame.Position).Unit * 5000
+			local rayw = workspace:Raycast(camera.CFrame.Position, direction, rayParams)
+			if values.enabled["aimWallbang"] and rayw and rayw.Instance and hasCollisionFidelity(rayw.Instance) and rayw.Instance.CollisionFidelity ~= "Default" then
+				rayParams.FilterDescendantsInstances = {LC.Character, rayw.Instance}
+			end
+			local ray = workspace:Raycast(camera.CFrame.Position, direction, rayParams)
+			if ray and ray.Instance and ray.Instance:IsDescendantOf(character) then
+				visible = true
+			end
+		end
+		return visible
+	end
+
+	local function updateAim()
+		closestCharacter = nil
+		closestDistance = math.huge
+
+		for _, player in ipairs(players:GetPlayers()) do
+			if player ~= LC and player.Character and player.Character:FindFirstChild("Head") then
+				local head = player.Character.Head
+				local vector, onScreen = camera:WorldToViewportPoint(head.Position)
+				local screenPoint = Vector2.new(vector.X, vector.Y)
+				local distance = (screenPoint - camera.ViewportSize/2).Magnitude
+
+				for _, w in pairs(head:GetChildren()) do
+					if w:IsA("WeldConstraint") and w.Part1 and w.Part1.Name == "FaceHitBox" then
+						w.Enabled = false
+					end
+				end
+				
+				if player.Character:FindFirstChild("FaceHitBox") then
+					player.Character.FaceHitBox.Anchored = true
+				end
+
+				if onScreen and distance < values.radius["aim"] and distance < closestDistance then
+					closestDistance = distance
+					closestCharacter = player.Character
+				end
+			end
+		end
+
+		if previousClosestCharacter ~= closestCharacter then
+			moveFaceHitBoxToAir(previousClosestCharacter)
+			previousClosestCharacter = closestCharacter
+		end
+
+		if closestCharacter and values.enabled["aim"] or values.enabled["aimAlwaysActivated"] then task.wait()
+			if not closestCharacter then
+				if tostring(aimTracer) == "Drawing" then
+					aimTracer:Remove()
+					aimTracer = nil
+				end
+				return
+			end
+			--Aim modes and logic
+			if values.misc["aimMode"] == "Lock" then
+				if closestCharacter:FindFirstChild("Head") then
+					local head = closestCharacter:FindFirstChild("Head")
+					if values.enabled["aimCheckVisible"] and isVisible(closestCharacter) or not values.enabled["aimCheckVisible"] then
+						camera.CFrame = CFrame.new(camera.CFrame.Position, head.Position)
+					end
+				end
+			elseif values.misc["aimMode"] == "Silent" then
+				if closestCharacter:FindFirstChild("Head") and camera:FindFirstChild("ViewModel") then
+					local head = closestCharacter:FindFirstChild("Head")
+					local vm = camera:FindFirstChild("ViewModel")
+					local ap = vm:FindFirstChild("AimPart")
+					local apc = vm:FindFirstChild("AimPartCanted")
+					local fc = vm:FindFirstChild("FakeCamera")
+					if ap and apc and fc then
+						if values.enabled["aimCheckVisible"] and isVisible(closestCharacter) or not values.enabled["aimCheckVisible"] then
+							ap.CFrame = CFrame.new(camera.CFrame.Position, head.Position)
+							apc.CFrame = CFrame.new(camera.CFrame.Position, head.Position)
+						end
+					end
+				end
+			elseif values.misc["aimMode"] == "OMEGA" then
+				if closestCharacter:FindFirstChild("Head") and camera:FindFirstChild("ViewModel") and closestCharacter:FindFirstChild("FaceHitBox") then
+					local head = closestCharacter:FindFirstChild("Head")
+					local vm = camera:FindFirstChild("ViewModel")
+					local ap = vm:FindFirstChild("AimPart")
+					local apc = vm:FindFirstChild("AimPartCanted")
+					local fc = vm:FindFirstChild("FakeCamera")
+					local fh = closestCharacter:FindFirstChild("FaceHitBox")
+					local hrp = vm:FindFirstChild("HumanoidRootPart")
+					if ap and apc and fc and fh and hrp then
+						if values.enabled["aimCheckVisible"] and isVisible(closestCharacter) or not values.enabled["aimCheckVisible"] then
+							fh.CFrame = CFrame.new(camera.CFrame.Position + camera.CFrame.LookVector * 3 + Vector3.new(0,1,0), fc.Position)
+							ap.CFrame = CFrame.new(camera.CFrame.Position, fh.Position)
+							apc.CFrame = CFrame.new(camera.CFrame.Position, fh.Position)
+						end
+					end
+				end
+			end
+
+			--Target tracer
+			if values.enabled["aimCheckVisible"] and isVisible(closestCharacter) or not values.enabled["aimCheckVisible"] then
+				if values.enabled["aimTracer"] and closestCharacter:FindFirstChild("HumanoidRootPart") then
+					local vector, onsc = camera:WorldToViewportPoint(closestCharacter.HumanoidRootPart.Position)
+					local screenPoint = Vector2.new(vector.X, vector.Y)
+					local distance = (screenPoint - camera.ViewportSize/2).Magnitude
+					if not aimTracer then
+						aimTracer = Drawing.new("Line")
+					end
+					aimTracer.Thickness = 2
+					aimTracer.Color = values.color["aimFov"]
+					if onsc and distance < values.radius["aim"] then
+						aimTracer.Transparency = 0.8
+						aimTracer.From = camera.ViewportSize/2
+						aimTracer.To = screenPoint
+					else
+						aimTracer.Transparency = 0
+					end
+				else
+					if tostring(aimTracer) == "Drawing" then
+						aimTracer:Remove()
+						aimTracer = nil
+					end
+				end
+			else
+				if tostring(aimTracer) == "Drawing" then
+					aimTracer.Transparency = 0
+				end
+			end
+		else
+			if tostring(aimTracer) == "Drawing" then
+				aimTracer:Remove()
+				aimTracer = nil
+			end
+			return
+		end
+
+	end
+	rs.RenderStepped:Connect(function()
+		if values.enabled["aim"] or values.enabled["aimAlwaysActivated"] then
+			updateAim()
+		end
+	end)
+end
+
+local function removeDrawings(elements, elementType)
+	for i = #elements[elementType], 1, -1 do
+		local d = elements[elementType][i]
+		if tostring(d) == "Drawing" then
+			d:Remove()
+			table.remove(elements[elementType], i)
+		elseif typeof(d) == "table" then
+			for b,c in pairs(d) do
+				if tostring(c) == "Drawing" then
+					c:Remove()
+				end
+			end
+		end
+	end
+end
+
+local function setIfDifferent(currentValue, newValue, setValueFunction)
+	if currentValue ~= newValue then
+		setValueFunction(newValue)
+	end
+end
+--]
+
+--[ UI ELEMENTS CREATING ]--
+--[ TABS
+local visualsTab = Window:CreateTab({Name = "Visuals"})
+local playerTab = Window:CreateTab({Name = "Player"})
+local combatTab = Window:CreateTab({Name = "Combat"})
+local worldTab = Window:CreateTab({Name = "World"})
+local screenTab = Window:CreateTab({Name = "Screen"})
+local miscTab = Window:CreateTab({Name = "Misc"})
+local settingsTab = Window:CreateTab({Name = "Settings"})
+--]
+--[ SECTIONS
+local playerVisualsSec = visualsTab:CreateSection({Name = "Players", Side = "Left"})
+local npcVisualsSec = visualsTab:CreateSection({Name = "Npc's", Side = "Left"})
+local containerVisualsSec = visualsTab:CreateSection({Name = "Containers", Side = "Right"})
+local vehicleVisualsSec = visualsTab:CreateSection({Name = "Vehicles", Side = "Right"})
+local corpseVisualsSec = visualsTab:CreateSection({Name = "Corpses", Side = "Right"})
+local droppedItemVisualsSec = visualsTab:CreateSection({Name = "DroppedItems", Side = "Right"})
+
+local movementSec = playerTab:CreateSection({Name = "Movement", Side = "Right"})
+
+local screenEffectsSec = screenTab:CreateSection({Name = "ScreenEffects", Side = "Right"})
+local crosshairSec = screenTab:CreateSection({Name = "Crosshair", Side = "Left"})
+
+local toggleVisualsSec = miscTab:CreateSection({Name = "Toggle Visuals", Side = "Right"})
+local inventoryCheckerSec = miscTab:CreateSection({Name = "InventroyChecker", Side = "Left"})
+local skinChangerSec = miscTab:CreateSection({Name = "SkinChanger", Side = "Left"})
+local viewmodelSec = miscTab:CreateSection({Name = "Viewmodel", Side = "Right"})
+local hitSoundSec = miscTab:CreateSection({Name = "HitSound", Side = "Left"})
+
+local aimSec = combatTab:CreateSection({Name = "Aim", Side = "Left"})
+local megaBulletsSec = combatTab:CreateSection({Name = "MegaBullets", Side = "Right"})
+local miscCombatSec = combatTab:CreateSection({Name = "Misc", Sied = "Left"})
+
+local choiceSettingsSec = settingsTab:CreateSection({Name = "Settings", Side = "Right"})
+local miscSettingsSec = settingsTab:CreateSection({Name = "Misc", Side = "Left"})
+
+local worldSettingsSec = worldTab:CreateSection({Name = "World Settings", Side = "Right"})
+--]
+--][--
+
+--[ SHIT ]--
+
+--[ VISUALS {{
+
+--[ PLAYER
+local playerEspToggle = playerVisualsSec:AddToggle({
+	Name = "Highlight",
+	Value = false,
+	Flag = 'playerEspToggleFlag',
+	Callback = function(value)
+		values.enabled["playerEsp"] = value
+		if not values.enabled["playerEsp"] then --If esp disabled then destroying players highlight
+			for i,v in ipairs(players:GetPlayers()) do
+				if v.Character and v.Character:FindFirstChildWhichIsA("Highlight") then
+					v.Character:FindFirstChildWhichIsA("Highlight"):Destroy()
+				end
+			end
+		end
+		while values.enabled["playerEsp"] do task.wait()
+			if not values.enabled["playerEsp"] then break end
+			for _,player in ipairs(players:GetPlayers()) do
+				if player.Name == LC.Name or not player.Character then continue end
+				if player.Character and player.Character.PrimaryPart and not player.Character:FindFirstChildWhichIsA("Highlight") and checkDistance(camera.CFrame.Position, player.Character.PrimaryPart.Position, values.distance["player"]) then
+					addHighlight(player.Character, values.color["playerEsp"], values.color["playerEspOutline"], values.transparency["playerEsp"])
+				elseif player.Character and player.Character:FindFirstChildWhichIsA("Highlight") then
+					local hg = player.Character:FindFirstChildWhichIsA("Highlight")
+					if hg and player and player.Character and player.Character.PrimaryPart and not checkDistance(camera.CFrame.Position, player.Character.PrimaryPart.Position, values.distance["player"]) then
+						hg:Destroy()
+						continue
+					elseif not player or not player.Character or not player.Character.PrimaryPart then
+						hg:Destroy()
+						continue
+					end
+					setIfDifferent(hg.FillColor, values.color["playerEsp"], function(color) hg.FillColor = color end)
+					setIfDifferent(hg.OutlineColor, values.color["playerEspOutline"], function(color) hg.OutlineColor = color end)
+					setIfDifferent(hg.FillTransparency, values.transparency["playerEsp"], function(transparency) hg.FillTransparency = transparency end)
+				end
+			end
+		end
+	end
+})
+
+local playerBoxToggle = playerVisualsSec:AddToggle({
+	Name = "Box",
+	Value = false,
+	Flag = 'playerBoxToggleFlag',
+	Callback = function(value)
+		values.enabled["playerBox"] = value
+
+		if not values.enabled["playerBox"] then
+			for _, v in ipairs(players:GetPlayers()) do
+				if not v.Character then continue end
+				local elements = getEspElements(v.Character, "player")
+				removeDrawings(elements, "boxes")
+				removeDrawings(elements, "boxOutlines")
+			end
+		else
+			while values.enabled["playerBox"] do
+				task.wait(1)
+				if not values.enabled["playerBox"] then break end
+				for _, v in ipairs(players:GetPlayers()) do
+					if v.Name == LC.Name or not v.Character then continue end
+					local elements = getEspElements(v.Character, "player")
+					if #elements.boxes <= 0 and v.Character.PrimaryPart and checkDistance(camera.CFrame.Position, v.Character.PrimaryPart.CFrame.Position, values.distance["player"]) then
+						addFrameBox(v.Character, "player")
+					end
+				end
+			end
+		end
+	end
+})
+
+local playerNameTagToggle = playerVisualsSec:AddToggle({
+	Name = "NameTag",
+	Value = false,
+	Flag = 'playerNameTagToggleFlag',
+	Callback = function(value)
+		values.enabled["playerNameTag"] = value
+
+		if not values.enabled["playerNameTag"] then
+			for _, v in ipairs(players:GetPlayers()) do
+				if not v.Character then continue end
+				local elements = getEspElements(v.Character, "player")
+				removeDrawings(elements, "nameTags")
+			end
+		else
+			while values.enabled["playerNameTag"] do
+				task.wait(1)
+				if not values.enabled["playerNameTag"] then break end
+				for _, v in ipairs(players:GetPlayers()) do
+					if v.Name == LC.Name or not v.Character then continue end
+					local elements = getEspElements(v.Character, "player")
+					if #elements.nameTags <= 0 and v.Character.PrimaryPart and checkDistance(camera.CFrame.Position, v.Character.PrimaryPart.CFrame.Position, values.distance["player"]) then
+						addNameTag(v.Character, "player")
+					end
+				end
+			end
+		end
+	end
+})
+
+local playerDistanceTagToggle = playerVisualsSec:AddToggle({
+	Name = "DistanceTag",
+	Value = false,
+	Flag = 'playerDistanceTagToggleFlag',
+	Callback = function(value)
+		values.enabled["playerDistanceTag"] = value
+
+		if not values.enabled["playerDistanceTag"] then
+			for _, v in ipairs(players:GetPlayers()) do
+				if not v.Character then continue end
+				local elements = getEspElements(v.Character, "player")
+				removeDrawings(elements, "distanceTags")
+			end
+		else
+			while values.enabled["playerDistanceTag"] do
+				task.wait(1)
+				if not values.enabled["playerDistanceTag"] then break end
+				for _, v in ipairs(players:GetPlayers()) do
+					if v.Name == LC.Name or not v.Character then continue end
+					local elements = getEspElements(v.Character, "player")
+					if #elements.distanceTags <= 0 and v.Character.PrimaryPart and checkDistance(camera.CFrame.Position, v.Character.PrimaryPart.CFrame.Position, values.distance["player"]) then
+						addDistanceTag(v.Character, "player")
+					end
+				end
+			end
+		end
+	end
+})
+
+local playerHealthTagToggle = playerVisualsSec:AddToggle({
+	Name = "HealthTag",
+	Value = false,
+	Flag = 'playerHealthTagToggleFlag',
+	Callback = function(value)
+		values.enabled["playerHealthTag"] = value
+
+		if not values.enabled["playerHealthTag"] then
+			for _, v in ipairs(players:GetPlayers()) do
+				if not v.Character then continue end
+				local elements = getEspElements(v.Character, "player")
+				removeDrawings(elements, "healthTags")
+			end
+		else
+			while values.enabled["playerHealthTag"] do
+				task.wait(1)
+				if not values.enabled["playerHealthTag"] then break end
+				for _, v in ipairs(players:GetPlayers()) do
+					if v.Name == LC.Name or not v.Character then continue end
+					local elements = getEspElements(v.Character, "player")
+					if #elements.healthTags <= 0 and v.Character.PrimaryPart and checkDistance(camera.CFrame.Position, v.Character.PrimaryPart.CFrame.Position, values.distance["player"]) then
+						addHealthTag(v.Character, "player")
+					end
+				end
+			end
+		end
+	end
+})
+
+table.insert(toggles, playerEspToggle)
+table.insert(toggles, playerBoxToggle)
+table.insert(toggles, playerNameTagToggle)
+table.insert(toggles, playerDistanceTagToggle)
+table.insert(toggles, playerHealthTagToggle)
+--]
+
+--[ NPC
+local npcEspToggle = npcVisualsSec:AddToggle({
+	Name = "Esp",
+	Value = false,
+	Flag = 'npcEspToggleFlag',
+	Callback = function(value)
+		values.enabled["npcEsp"] = value
+
+		if not values.enabled["npcEsp"] then
+			for _,f in ipairs(workspace.AiZones:GetChildren()) do --NPC ZONES FOLDERS
+				for i,v in ipairs(f:GetChildren()) do --NPC
+					if v:IsA("Model") then
+						for _,p in ipairs(v:GetChildren()) do
+							if p:FindFirstChild(p.Name.."Box") then
+								p:FindFirstChild(p.Name.."Box"):Destroy()
+							end
+						end
+					end
+				end
+			end
+		end
+
+		while values.enabled["npcEsp"] do task.wait(1)
+			if not values.enabled["npcEsp"] then break end
+			if not workspace:FindFirstChild("AiZones") then break end
+			for _,f in ipairs(workspace.AiZones:GetChildren()) do --NPC ZONES FOLDERS
+				for i,v in ipairs(f:GetChildren()) do --NPC
+					if v:IsA("Model") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
+						for _,p in ipairs(v:GetChildren()) do
+							if p:IsA("MeshPart") and not p:FindFirstChild(p.Name.."Box") and checkDistance(camera.CFrame.Position, p.CFrame.Position, values.distance["npc"]) then
+								addBox(p, p, values.color["npcEsp"], values.transparency["npcEsp"])
+							elseif p:FindFirstChild(p.Name.."Box") then
+								local box = p:FindFirstChild(p.Name.."Box")
+								if box and not checkDistance(camera.CFrame.Position, p.CFrame.Position, values.distance["npc"]) then
+									box:Destroy()
+									continue
+								elseif box then
+									setIfDifferent(box.Color3, values.color["npcEsp"], function(color) box.Color3 = color end)
+									setIfDifferent(box.Transparency, values.transparency["npcEsp"], function(transparency) box.Transparency = transparency end)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+})
+
+local npcBoxToggle = npcVisualsSec:AddToggle({
+	Name = "Box",
+	Value = false,
+	Flag = 'npcBoxToggleFlag',
+	Callback = function(value)
+		values.enabled["npcBox"] = value
+
+		if not values.enabled["npcBox"] then
+			for _,f in ipairs(workspace.AiZones:GetChildren()) do
+				for i,v in ipairs(f:GetChildren()) do
+					if v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") then
+						local elements = getEspElements(v, "npc")
+						if #elements.boxes >= 1 or #elements.boxOutlines >= 1 then
+							removeDrawings(elements, "boxes")
+							removeDrawings(elements, "boxOutlines")
+						end
+					end
+				end
+			end
+		else
+			while values.enabled["npcBox"] do task.wait(1)
+				if not values.enabled["npcBox"] then break end
+				for _,f in ipairs(workspace.AiZones:GetChildren()) do
+					for i,v in ipairs(f:GetChildren()) do
+						local elements = getEspElements(v, "npc")
+						if #elements.boxes <= 0 and v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["npc"]) then
+							addFrameBox(v, "npc")
+						end
+					end
+				end
+			end
+		end
+	end
+})
+
+local npcNameTagToggle = npcVisualsSec:AddToggle({
+	Name = "NameTag",
+	Value = false,
+	Flag = 'npcNameTagToggleFlag',
+	Callback = function(value)
+		values.enabled["npcNameTag"] = value
+
+		if not values.enabled["npcNameTag"] then
+			for _,f in ipairs(workspace.AiZones:GetChildren()) do
+				for i,v in ipairs(f:GetChildren()) do
+					if v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") then
+						local elements = getEspElements(v, "npc")
+						if #elements.nameTags >= 1 then
+							removeDrawings(elements, "nameTags")
+						end
+					end
+				end
+			end
+		else
+			while values.enabled["npcNameTag"] do task.wait(1)
+				if not values.enabled["npcNameTag"] then break end
+				for _,f in ipairs(workspace.AiZones:GetChildren()) do
+					for i,v in ipairs(f:GetChildren()) do
+						local elements = getEspElements(v, "npc")
+						if #elements.nameTags <= 0 and v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["npc"]) then
+							addNameTag(v, "npc")
+						end
+					end
+				end
+			end
+		end
+	end
+})
+
+local npcDistanceTagToggle = npcVisualsSec:AddToggle({
+	Name = "DistanceTag",
+	Value = false,
+	Flag = 'npcDistanceTagToggleFlag',
+	Callback = function(value)
+		values.enabled["npcDistanceTag"] = value
+
+		if not values.enabled["npcDistanceTag"] then
+			for _,f in ipairs(workspace.AiZones:GetChildren()) do
+				for i,v in ipairs(f:GetChildren()) do
+					if v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") then
+						local elements = getEspElements(v, "npc")
+						if #elements.distanceTags >= 1 then
+							removeDrawings(elements, "distanceTags")
+						end
+					end
+				end
+			end
+		else
+			while values.enabled["npcDistanceTag"] do task.wait(1)
+				if not values.enabled["npcDistanceTag"] then break end
+				for _,f in ipairs(workspace.AiZones:GetChildren()) do
+					for i,v in ipairs(f:GetChildren()) do
+						local elements = getEspElements(v, "npc")
+						if #elements.distanceTags <= 0 and v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["npc"]) then
+							addDistanceTag(v, "npc")
+						end
+					end
+				end
+			end
+		end
+	end
+})
+
+local npcHealthTagToggle = npcVisualsSec:AddToggle({
+	Name = "HealthTag",
+	Value = false,
+	Flag = 'npcHealthTagToggleFlag',
+	Callback = function(value)
+		values.enabled["npcHealthTag"] = value
+
+		if not values.enabled["npcHealthTag"] then
+			for _,f in ipairs(workspace.AiZones:GetChildren()) do
+				for i,v in ipairs(f:GetChildren()) do
+					if v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") then
+						local elements = getEspElements(v, "npc")
+						if #elements.healthTags >= 1 then
+							removeDrawings(elements, "healthTags")
+						end
+					end
+				end
+			end
+		else
+			while values.enabled["npcHealthTag"] do task.wait(1)
+				if not values.enabled["npcHealthTag"] then break end
+				for _,f in ipairs(workspace.AiZones:GetChildren()) do
+					for i,v in ipairs(f:GetChildren()) do
+						local elements = getEspElements(v, "npc")
+						if #elements.healthTags <= 0 and v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["npc"]) then
+							addHealthTag(v, "npc")
+						end
+					end
+				end
+			end
+		end
+	end
+})
+table.insert(toggles, npcEspToggle)
+table.insert(toggles, npcBoxToggle)
+table.insert(toggles, npcNameTagToggle)
+table.insert(toggles, npcDistanceTagToggle)
+table.insert(toggles, npcHealthTagToggle)
+--]
+
+--[ VEHICLE
+local vehicleEspToggle = vehicleVisualsSec:AddToggle({
+	Name = "Esp",
+	Value = false,
+	Flag = 'vehicleEspToggleFlag',
+	Callback = function(value)
+		values.enabled["vehicleEsp"] = value
+		if not workspace:FindFirstChild("Vehicles") then return end
+
+		if not values.enabled["vehicleEsp"] then --Delete boxes if esp not enabled
+			for i,v in ipairs(workspace.Vehicles:GetChildren()) do
+				if v:FindFirstChild("Body") and v.Body.PrimaryPart and v.Body.PrimaryPart:FindFirstChild(v.Body.PrimaryPart.Name.."Box") then
+					v.Body.PrimaryPart:FindFirstChild(v.Body.PrimaryPart.Name.."Box"):Destroy()
+				end
+			end
+		end
+
+		while values.enabled["vehicleEsp"] do task.wait(1)
+			if not values.enabled["vehicleEsp"] then break end
+			if not workspace:FindFirstChild("Vehicles") then break end
+			if #workspace.Vehicles:GetChildren() >= 1 then
+				for i,v in ipairs(workspace.Vehicles:GetChildren()) do
+					if v:FindFirstChild("Body") and v.Body.PrimaryPart and not v.Body.PrimaryPart:FindFirstChild(v.Body.PrimaryPart.Name.."Box") and checkDistance(camera.CFrame.Position, v.Body.PrimaryPart.CFrame.Position, values.distance["vehicle"]) then
+						addBox(v.Body.PrimaryPart, v.Body.PrimaryPart, values.color["vehicleEsp"], values.transparency["vehicleEsp"])
+					elseif v:FindFirstChild("Body") and v.Body.PrimaryPart and v.Body.PrimaryPart:FindFirstChild(v.Body.PrimaryPart.Name.."Box") then
+						local box = v.Body.PrimaryPart:FindFirstChild(v.Body.PrimaryPart.Name.."Box")
+						if not checkDistance(camera.CFrame.Position, v.Body.PrimaryPart.CFrame.Position, values.distance["vehicle"]) then box:Destroy() continue end
+						setIfDifferent(box.Color3, values.color["vehicleEsp"], function(color) box.Color3 = color end)
+						setIfDifferent(box.Transparency, values.transparency["vehicleEsp"], function(transparency) box.Transparency = transparency end)
+					end
+				end
+			end
+		end
+	end
+})
+
+local vehicleNameTagToggle = vehicleVisualsSec:AddToggle({
+	Name = "NameTag",
+	Value = false,
+	Flag = 'vehicleNameTagToggleFlag',
+	Callback = function(value)
+		values.enabled["vehicleNameTag"] = value
+		if not workspace:FindFirstChild("Vehicles") then return end
+
+		if not values.enabled["vehicleNameTag"] then
+			for i,v in ipairs(workspace.Vehicles:GetChildren()) do
+				if not v.Body then return end
+				local elements = getEspElements(v.Body, "vehicle")
+				removeDrawings(elements, "nameTags")
+			end
+		else
+			while values.enabled["vehicleNameTag"] do
+				task.wait(1)
+				if not values.enabled["vehicleNameTag"] then break end
+				for i,v in ipairs(workspace.Vehicles:GetChildren()) do
+					if not v.Body then continue end
+					local elements = getEspElements(v.Body, "vehicle")
+					if #elements.nameTags <= 0 and v.Body.PrimaryPart and checkDistance(camera.CFrame.Position, v.Body.PrimaryPart.CFrame.Position, values.distance["vehicle"]) then
+						addNameTag(v.Body, "vehicle")
+					end
+				end
+			end
+		end
+	end
+})
+table.insert(toggles, vehicleEspToggle)
+table.insert(toggles, vehicleNameTagToggle)
+--]
+
+--[ CONTAINER
+local containerEspToggle = containerVisualsSec:AddToggle({
+	Name = "Esp",
+	Value = false,
+	Flag = 'containerEspToggleFlag',
+	Callback = function(value)
+		values.enabled["containerEsp"] = value
+		if not workspace:FindFirstChild("Containers") then return end
+
+		if not values.enabled["containerEsp"] then --Delete boxes if esp not enabled
+			for i,v in ipairs(workspace.Containers:GetChildren()) do
+				if v:IsA("Model") and v.PrimaryPart and v.PrimaryPart:FindFirstChild(v.PrimaryPart.Name.."Box") then
+					v.PrimaryPart:FindFirstChild(v.PrimaryPart.Name.."Box"):Destroy()
+				end
+			end
+		end
+
+		while values.enabled["containerEsp"] do task.wait(1)
+			if not values.enabled["containerEsp"] or not workspace:FindFirstChild("Containers") then break end
+			for i,v in ipairs(workspace.Containers:GetChildren()) do
+				if v:IsA("Model") and v.PrimaryPart and not v.PrimaryPart:FindFirstChild(v.PrimaryPart.Name.."Box") and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["container"]) then
+					addBox(v.PrimaryPart, v.PrimaryPart, values.color["containerEsp"], values.transparency["containerEsp"])
+				elseif v:IsA("Model") and v.PrimaryPart and v.PrimaryPart:FindFirstChild(v.PrimaryPart.Name.."Box") then
+					local box = v.PrimaryPart:FindFirstChild(v.PrimaryPart.Name.."Box")
+					if box and not checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["container"]) then box:Destroy() continue end
+					setIfDifferent(box.Color3, values.color["containerEsp"], function(color) box.Color3 = color end)
+					setIfDifferent(box.Transparency, values.transparency["containerEsp"], function(transparency) box.Transparency = transparency end)
+				end
+			end
+		end
+	end
+})
+
+local containerNameTagToggle = containerVisualsSec:AddToggle({
+	Name = "NameTag",
+	Value = false,
+	Flag = 'containerNameTagToggleFlag',
+	Callback = function(value)
+		values.enabled["containerNameTag"] = value
+		if not workspace:FindFirstChild("Containers") then return end
+
+		if not values.enabled["containerNameTag"] then
+			for _, v in ipairs(workspace.Containers:GetChildren()) do
+				if v:IsA("Model") then
+					local elements = getEspElements(v, "container")
+					removeDrawings(elements, "nameTags")
+				end
+			end
+		else
+			while values.enabled["containerNameTag"] do
+				task.wait(1)
+				if not values.enabled["containerNameTag"] then break end
+				for _, v in ipairs(workspace.Containers:GetChildren()) do
+					if v:IsA("Model") and v.PrimaryPart then
+						local elements = getEspElements(v, "container")
+						if #elements.nameTags <= 0 and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["container"]) then
+							if checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["container"]) then
+								addNameTag(v, "container")
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+})
+table.insert(toggles, containerNameTagToggle)
+table.insert(toggles, containerEspToggle)
+--]
+
+--[ CORPSE
+local corpseNameTagToggle = corpseVisualsSec:AddToggle({
+	Name = "NameTag",
+	Value = false,
+	Flag = "corpseNameTagToggleFlag",
+	Callback = function(value)
+		values.enabled["corpseNameTag"] = value
+		
+		if not values.enabled["corpseNameTag"] then
+			for _, v in ipairs(workspace.DroppedItems:GetChildren()) do
+				if v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") then
+					local elements = getEspElements(v, "corpse")
+					removeDrawings(elements, "nameTags")
+				end
+			end
+		end
+
+		while values.enabled["corpseNameTag"] do task.wait(1); if not values.enabled["corpseNameTag"] then break end;
+			for i,v in ipairs(workspace.DroppedItems:GetChildren()) do
+				if v:IsA("Model") and v.PrimaryPart and v:FindFirstChildWhichIsA("Humanoid") then
+					local elements = getEspElements(v, "corpse")
+					if #elements.nameTags <= 0 and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["corpse"]) then
+						addNameTag(v, "corpse")
+					end
+				end
+			end
+		end
+	end
+})
+
+table.insert(toggles, corpseNameTagToggle)
+--]
+
+--[ DROPPEDITEM
+local droppedItemNameTagToggle = droppedItemVisualsSec:AddToggle({
+	Name = "NameTag",
+	Value = false,
+	Flag = "droppedItemNameTagToggleFlag",
+	Callback = function(value)
+		values.enabled["droppedItemNameTag"] = value
+		
+		if not values.enabled["droppedItemNameTag"] then
+			for _, v in ipairs(workspace.DroppedItems:GetChildren()) do
+				if v:IsA("Model") and v.PrimaryPart and not v:FindFirstChildWhichIsA("Humanoid") then
+					local elements = getEspElements(v, "droppedItem")
+					removeDrawings(elements, "nameTags")
+				end
+			end
+		end
+
+		while values.enabled["droppedItemNameTag"] do task.wait(1); if not values.enabled["droppedItemNameTag"] then break end;
+			for i,v in ipairs(workspace.DroppedItems:GetChildren()) do
+				if v:IsA("Model") and v.PrimaryPart and not v:FindFirstChildWhichIsA("Humanoid") then
+					local elements = getEspElements(v, "droppedItem")
+					if #elements.nameTags <= 0 and checkDistance(camera.CFrame.Position, v.PrimaryPart.CFrame.Position, values.distance["droppedItem"]) then
+						addNameTag(v, "droppedItem")
+					end
+				end
+			end
+		end
+	end
+})
+table.insert(toggles, droppedItemNameTagToggle)
+--]
+
+--] }}
+
+--[ PLAYER {{
+
+--[ TOGGLES
+local loadedAnim1
+local bangerToggle = movementSec:AddToggle({
+	Name = "Banger",
+	Value = false,
+	Flag = 'bangerToggleFlag',
+	Callback = function(value)
+		values.enabled["banger"] = value
+		local function stopAnimation()
+			if loadedAnim1 then
+				loadedAnim1:Stop()
+				loadedAnim1:Destroy()
+				loadedAnim1 = nil
+			end
+		end
+
+		local function startAnimation()
+			local char = LC.Character or LC.CharacterAdded:Wait()
+			local humanoid = char:FindFirstChildWhichIsA("Humanoid")
+			if not humanoid then return end
+
+			local anim1 = Instance.new("Animation")
+			anim1.AnimationId = "rbxassetid://5918726674"
+			loadedAnim1 = humanoid:LoadAnimation(anim1)
+			loadedAnim1:Play()
+			loadedAnim1:AdjustSpeed(1000000)
+		end
+
+		local function onCharacterAdded(char)
+			local humanoid = char:WaitForChild("Humanoid")
+
+			humanoid.Died:Connect(function()
+				stopAnimation()
+			end)
+
+			if values.enabled["banger"] then
+				startAnimation()
+			end
+		end
+
+		LC.CharacterAdded:Connect(onCharacterAdded)
+
+		if value then
+			startAnimation()
+		else
+			stopAnimation()
+		end
+	end
+})
+
+local tpWalkToggle = movementSec:AddToggle({
+	Name = "TpWalk",
+	Value = false,
+	Flag = 'tpWalkToggleFlag',
+	Callback = function(value)
+		values.enabled["tpWalk"] = value
+		repeat
+			local delta = rs.Heartbeat:Wait()
+			if LC.Character and LC.Character:FindFirstChildWhichIsA("Humanoid") and LC.Character.Humanoid.MoveDirection.Magnitude > 0 then
+				LC.Character:TranslateBy(LC.Character.Humanoid.MoveDirection * values.misc["tpWalkSpeed"] * delta * 10)
+			end
+		until not values.enabled["tpWalk"]
+	end
+})
+
+local bunnyHopToggle = movementSec:AddToggle({
+	Name = "BunnyHop",
+	Value = false,
+	Flag = 'bunnyHopToggleFlag',
+	Callback = function(value)
+		values.enabled["bunnyHop"] = value
+		repeat
+			if LC.Character and LC.Character:FindFirstChildWhichIsA("Humanoid") then
+				LC.Character.Humanoid:SetAttribute("JumpCooldown", 0)
+			end
+			task.wait()
+		until not values.enabled["bunnyHop"]
+	end
+})
+--]
+
+--[ SLIDERS
+local tpWalkSpeedSlider = movementSec:AddSlider({
+	Name = "TpWalkSpeed",
+	Flag = "tpWalkSpeedSectionFlag",
+	Value = 1,
+	Min = 0.1,
+	Max = 2,
+	Decimals = 1,
+	Callback = function(value)
+		values.misc["tpWalkSpeed"] = value
+	end
+})
+--]
+
+--] }}
+
+--[ WORLD {{
+
+--[ TOGGLES {
+local fullbrightToggle = worldSettingsSec:AddToggle({
+	Name = "FullBright",
+	Value = false,
+	Flag = "fullbrightToggleFlag",
+	Callback = function(value)
+		values.enabled["fullbright"] = value
+		if values.enabled["fullbright"] then
+			lighting.Ambient = Color3.new(1, 1, 1)
+			lighting.ColorShift_Bottom = Color3.new(1, 1, 1)
+			lighting.ColorShift_Bottom = Color3.new(1, 1, 1)
+		else
+			lighting.Ambient = Color3.new(0, 0, 0)
+			lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+			lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+		end
+	end
+})
+
+local removefogToggle = worldSettingsSec:AddToggle({
+	Name = "RemoveFog",
+	Value = false,
+	Flag = "removefogToggleFlag",
+	Callback = function(value)
+		values.enabled["removefog"] = value
+		while values.enabled["removefog"] do task.wait()
+			lighting.Atmosphere.Density = 0
+			lighting.Atmosphere.Offset = 0
+		end
+	end
+})
+
+local removefoliageToggle = worldSettingsSec:AddToggle({
+	Name = "RemoveFoliage",
+	Value = false,
+	Flag = "removefoliageToggleFlag",
+	Callback = function(value)
+		values.enabled["removefoliage"] = value
+		if values.enabled["removefoliage"] then
+			while values.enabled["removefoliage"] do task.wait(5)
+				if not workspace:FindFirstChild("SpawnerZones") or not workspace.SpawnerZones:FindFirstChild("Foliage") then return end
+				if values.enabled["removefoliage"] == false then continue end
+				for i,v in ipairs(workspace.SpawnerZones.Foliage:GetChildren()) do
+					for _,f in ipairs(v:GetChildren()) do
+						for _,s in ipairs(f:GetChildren()) do
+							if s:IsA("MeshPart") and s.Transparency == 0 then
+								if s.Color == Color3.fromRGB(163, 162, 165) then
+									s.Transparency = 1
+								end
+							end 
+						end
+					end
+				end
+			end
+		elseif not values.enabled["removefoliage"] then
+			if not workspace:FindFirstChild("SpawnerZones") or not workspace.SpawnerZones:FindFirstChild("Foliage") then return end
+			for i,v in ipairs(workspace.SpawnerZones.Foliage:GetChildren()) do
+				for _,f in ipairs(v:GetChildren()) do
+					for _,s in ipairs(f:GetChildren()) do
+						if s:IsA("MeshPart") then
+							if s.Color == Color3.fromRGB(163, 162, 165) and s.Transparency == 1 then
+								s.Transparency = 0
+							end
+						end 
+					end
+				end
+			end
+		end
+	end
+})
+
+local jesusFolder = workspace:FindFirstChild("JesusFolder") or Instance.new("Folder", workspace)
+jesusFolder.Name = "JesusFolder"
+
+local jesusToggle = worldSettingsSec:AddToggle({
+	Name = "Jesus",
+	Value = false,
+	Flag = "jesusToggleFlag",
+	Callback = function(value)
+		values.enabled["jesus"] = value
+
+		local character = LC.Character or LC.CharacterAdded:Wait()
+		local part = character:FindFirstChild("Head")
+		local rayparams = RaycastParams.new()
+		rayparams.FilterType = Enum.RaycastFilterType.Exclude
+		rayparams.FilterDescendantsInstances = {character}
+
+		local circleDuration = 10
+		local circleRadius = 20
+
+		local function spawnCircle(position)
+			local circle = Instance.new("Part")
+			circle.Parent = jesusFolder
+			circle.Size = Vector3.new(circleRadius * 2, 0.2, circleRadius * 2)
+			circle.Anchored = true
+			circle.Position = position
+			circle.Material = Enum.Material.ForceField
+			task.spawn(function()
+				task.wait(circleDuration)
+				if circle and circle.Parent then
+					circle:Destroy()
+				end
+			end)
+		end
+
+		local function raycastAndSpawn(origin, direction)
+			local rayres = workspace:Raycast(origin, direction, rayparams)
+			if rayres and rayres.Material == Enum.Material.Water then
+				spawnCircle(rayres.Position)
+			end
+		end
+
+		local function monitorCharacter()
+			while true do
+				if not LC.Character then
+					character = LC.CharacterAdded:Wait()
+					part = character:FindFirstChild("Head")
+					rayparams.FilterDescendantsInstances = {character}
+				end
+				task.wait(1)
+			end
+		end
+
+		task.spawn(monitorCharacter)
+
+		while values.enabled["jesus"] do
+			task.wait(0.1)
+			if not values.enabled["jesus"] or not character then
+				continue
+			end
+			local camera = game.Workspace.CurrentCamera
+			if not camera then
+				continue
+			end
+
+			local forwardVector = camera.CFrame.LookVector
+			local rightVector = camera.CFrame.RightVector
+			local rayOrigin = part.Position + Vector3.new(0, 150, 0)
+
+			raycastAndSpawn(rayOrigin, Vector3.new(0, -300, 0))
+			raycastAndSpawn(rayOrigin, forwardVector * 10 + Vector3.new(0, -300, 0)) 
+			raycastAndSpawn(rayOrigin, -forwardVector * 10 + Vector3.new(0, -300, 0))
+			raycastAndSpawn(rayOrigin, rightVector * 10 + Vector3.new(0, -300, 0))
+			raycastAndSpawn(rayOrigin, -rightVector * 10 + Vector3.new(0, -300, 0))
+
+			task.wait(0.1)
+		end
+	end
+})
+
+
+table.insert(toggles, fullbrightToggle)
+table.insert(toggles, removefoliageToggle)
+table.insert(toggles, removefogToggle)
+table.insert(toggles, jesusToggle)
+--] }
+
+--] }}
+
+--[ SCREEN {{
+
+--[ TOGGLES 
+local noScreenEffectsToggle = screenEffectsSec:AddToggle({
+	Name = "No screen effects",
+	Value = false,
+	Flag = 'noScreenEffectsToggleFlag',
+	Callback = function(value)
+		values.enabled["noScreenEffects"] = value
+		while values.enabled["noScreenEffects"] do task.wait(0.1)
+		local pg = LC.PlayerGui
+			if pg and pg:FindFirstChild("MainGui") and pg.MainGui:FindFirstChild("MainFrame") and pg.MainGui.MainFrame:FindFirstChild("ScreenEffects") then
+				for i,v in ipairs(LC.PlayerGui.MainGui.MainFrame.ScreenEffects:GetChildren()) do
+					if v:IsA("Frame") then
+						v.Visible = false
+					end
+				end
+			end
+		end
+	end
+})
+
+local lines
+local crosshairToggle = crosshairSec:AddToggle({
+	Name = "Crosshair",
+	Value = false,
+	Flag = 'crosshairToggleFlag',
+	Callback = function(value)
+		values.enabled["crosshair"] = value
+		if values.enabled["crosshair"] then
+			if not sg:FindFirstChild("crosshairFrame") and values.misc["crosshairType"] == "Dot" then
+				local Frame = Instance.new("Frame", sg)
+				Frame.Name = "crosshairFrame"
+				Frame.Size = UDim2.fromOffset(3,3)
+				Frame.AnchorPoint = Vector2.new(0.5,0.5)
+				Frame.Interactable = false
+				Frame.Position = UDim2.fromScale(0.5,0.5)
+				Frame.BackgroundColor3 = values.color["crosshair"]
+			end
+		else
+			if sg:FindFirstChild("crosshairFrame") then 
+				sg.crosshairFrame:Destroy()
+			end
+		end
+	end
+})
+
+table.insert(toggles, noScreenEffectsToggle)
+table.insert(toggles, crosshairToggle)
+--]
+
+--[ SLIDERS
+local fovSlider = screenEffectsSec:AddSlider({
+	Name = "Fov",
+	Flag = "fovSliderFlag",
+	Value = 100,
+	Min = 5,
+	Max = 120,
+	Callback = function(value)
+		if rp.Players and rp.Players:FindFirstChild(LC.Name) and rp.Players:FindFirstChild(LC.Name).Settings then
+			local settings = rp.Players:FindFirstChild(LC.Name).Settings
+			settings.GameplaySettings:SetAttribute("DefaultFOV", value)
+		end
+		values.misc["fov"] = value
+	end
+})
+
+local fovChangeSlider = screenEffectsSec:AddSlider({
+	Name = "Decrease Fov Value",
+	Flag = "fovChangeSliderFlag",
+	Value = 60,
+	Min = 5,
+	Max = 100,
+	Callback = function(value)
+		values.misc["fovChange"] = value
+	end
+})
+--]
+
+--[ KEYBINDS
+local ic3Connect
+local decreaseFovKeybind = screenEffectsSec:AddKeybind({
+	Name = "Decrease Fov Bind",
+	Value = Enum.KeyCode.C,
+	Flag = "decreaseFovKeybindFlag",
+	Pressed = function(io, gp)
+		ic3Connect = uis.InputEnded:Connect(function(input, _)
+			if input.KeyCode == io.KeyCode then
+				ic3Connect:Disconnect()
+				if rp.Players and rp.Players:FindFirstChild(LC.Name) and rp.Players:FindFirstChild(LC.Name).Settings then
+					local settings = rp.Players:FindFirstChild(LC.Name).Settings
+					settings.GameplaySettings:SetAttribute("DefaultFOV", values.misc["fov"])
+				end
+			end
+		end)
+		if rp.Players and rp.Players:FindFirstChild(LC.Name) and rp.Players:FindFirstChild(LC.Name).Settings then
+			local settings = rp.Players:FindFirstChild(LC.Name).Settings
+			settings.GameplaySettings:SetAttribute("DefaultFOV", values.misc["fovChange"])
+		end
+	end,
+})
+--]
+
+--] }}
+
+--[ COMBAT {{
+
+--[ TOGGLES
+local aimCheckVisibleToggle = aimSec:AddToggle({
+	Name = "Check visible",
+	Value = false,
+	Flag = 'aimCheckVisibleFlag',
+	Callback = function(value)
+		values.enabled["aimCheckVisible"] = value
+	end
+})
+
+local megaBulletsToggle = megaBulletsSec:AddToggle({
+	Name = "Mega Bullets",
+	Value = false,
+	Flag = 'megaBulletsToggleFlag',
+	Callback = function(value)
+		values.enabled["megaBullets"] = value
+		if values.enabled["megaBullets"] and rp:FindFirstChild("AmmoTypes") then
+			for i,v in ipairs(rp.AmmoTypes:GetChildren()) do
+				if v then
+					v:SetAttribute("ProjectileDrop", 0)
+					v:SetAttribute("Tracer", true)
+					v:SetAttribute("Drag", 0)
+					v:SetAttribute("MuzzleVelocity", 3000)
+					v:SetAttribute("RecoilStrength", 0)
+					if v:GetAttribute("AccuracyDeviation") then
+						v:SetAttribute("AccuracyDeviation", 0)
+					end
+				end
+			end
+		elseif not values.enabled["megaBullets"] and rp:FindFirstChild("AmmoTypes") then
+			for i,v in ipairs(rp.AmmoTypes:GetChildren()) do
+				if v then
+					local realAmmo = realAmmoTypes:FindFirstChild(v.Name)
+					if realAmmo then
+						v:SetAttribute("ProjectileDrop", realAmmo:GetAttribute("ProjectileDrop"))
+						v:SetAttribute("Tracer", realAmmo:GetAttribute("Tracer"))
+						v:SetAttribute("Drag", realAmmo:GetAttribute("Drag"))
+						v:SetAttribute("MuzzleVelocity", realAmmo:GetAttribute("MuzzleVelocity"))
+						v:SetAttribute("RecoilStrength", realAmmo:GetAttribute("RecoilStrength"))
+						if v:GetAttribute("AccuracyDeviation") then
+							v:SetAttribute("AccuracyDeviation", realAmmo:GetAttribute("AccuracyDeviation"))
+						end
+					end
+				end
+			end
+		end
+	end
+})
+
+local aimFovToggle = aimSec:AddToggle({
+	Name = "Aim Fov",
+	Value = false,
+	Flag = 'aimFovFlag',
+	Callback = function(value)
+		values.enabled["aimFov"] = value
+		if values.enabled["aimFov"] then
+			fovCircle = Drawing.new("Circle")
+			fovCircle.Radius = values.radius["aim"]
+			fovCircle.Transparency = 1
+			fovCircle.Position = camera.ViewportSize/2
+			fovCircle.Visible = true
+			fovCircle.Thickness = 1.54
+			while values.enabled["aimFov"] do
+				task.wait()
+				fovCircle.Radius = values.radius["aim"]
+				fovCircle.Color = values.color["aimFov"]
+			end
+		else
+			fovCircle.Visible = false
+			fovCircle.Transparency = 0
+		end
+	end
+})
+
+local aimAlwaysActivatedToggle = aimSec:AddToggle({
+	Name = "AimAlwaysActivated",
+	Value = false,
+	Flag = 'aimAlwaysActivatedToggleFlag',
+	Callback = function(value)
+		values.enabled["aimAlwaysActivated"] = value
+		if values.enabled["aimAlwaysActivated"] then
+			aim()
+		end
+	end
+})
+
+local aimWallbangToggle = aimSec:AddToggle({
+	Name = "Wallbang",
+	Value = false,
+	Flag = 'aimWallbangToggleFlag',
+	Callback = function(value)
+		values.enabled["aimWallbang"] = value
+	end
+})
+
+local aimTracerToggle = aimSec:AddToggle({
+	Name = "AimTracer",
+	Value = false,
+	Flag = 'aimTracerFlag',
+	Callback = function(value)
+		values.enabled["aimTracer"] = value
+	end
+})
+
+table.insert(toggles, aimCheckVisibleToggle)
+table.insert(toggles, megaBulletsToggle)
+table.insert(toggles, aimAlwaysActivatedToggle)
+table.insert(toggles, aimTracerToggle)
+--]
+
+--[ DROPDOWNS
+local aimModeDrop = aimSec:AddDropdown({
+	Name = "Aim Mode",
+	List = {"Lock", "Silent", "OMEGA"},
+	Flag = "aimModeDropFlag",
+	Callback = function(value)
+		values.misc["aimMode"] = value
+	end,
+})
+--]
+
+--[ SLIDERS
+local aimRadiusSlider = aimSec:AddSlider({
+	Name = "FOV Radius",
+	Flag = "aimFovRadiusFlag",
+	Value = 100,
+	Min = 10,
+	Max = 400,
+	Callback = function(value)
+		values.radius["aim"] = value
+	end
+})
+
+
+--]
+
+--[ KEYBINDS
+local ic2Connect
+local aimKeybind = aimSec:AddKeybind({
+	Name = "Aim Button",
+	Value = Enum.KeyCode.X,
+	Flag = "aimKeyFlag",
+	Mode = "Hold",
+	Pressed = function(io, gp)
+		values.enabled["aim"] = true
+		ic2Connect = uis.InputEnded:Connect(function(input, _)
+			if input.KeyCode == io.KeyCode then
+				values.enabled["aim"] = false
+				ic2Connect:Disconnect()
+				if tostring(aimTracer) == "Drawing" then
+					aimTracer:Remove()
+					aimTracer = nil
+				end
+			end
+		end)
+		aim()
+	end,
+})
+--]
+
+--] }}
+
+--[ MISC {{
+
+--[ TOGGLES
+
+local skinChangerToggle = skinChangerSec:AddToggle({
+	Name = "SkinChanger",
+	Value = false,
+	Flag = 'skinChangerToggleFlag',
+	Callback = function(value)
+		values.enabled["skinChanger"] = value
+		while values.enabled["skinChanger"] do task.wait(1)
+			local DV2 = game.ReplicatedStorage.ViewModels:FindFirstChild("DV2")
+			local Ninjato = game.ReplicatedStorage.ViewModels:FindFirstChild("PlasmaNinjato")
+			if DV2 and Ninjato then
+				DV2.Name = ("DV2real")
+				Ninjato.Name = ("DV2")
+			end
+			if rp:FindFirstChild("Players") and rp.Players:FindFirstChild(LC.Name) then
+				local plr = rp.Players:FindFirstChild(LC.Name)
+				for i,v in plr:GetDescendants() do
+					if v:FindFirstChild("ItemProperties") and skins[v.Name] then
+						v.ItemProperties:SetAttribute("Skin", skins[v.Name])
+					end
+				end
+			end
+		end
+	end
+})
+
+local customViewModelToggle = viewmodelSec:AddToggle({
+	Name = "Custom ViewModel",
+	Value = false,
+	Flag = 'customViewModelToggleFlag',
+	Callback = function(value)
+		values.enabled["customViewmodel"] = value
+		local function updateVm(vm)
+			if values.enabled["customViewmodel"] then
+				if not vm:FindFirstChild("Item") then return end
+				for i, v in ipairs(vm.Item:GetDescendants()) do
+					if v:IsA("MeshPart") or v:IsA("Part") then
+						if v.Transparency ~= 1 then
+							v.Transparency = values.transparency["viewmodel"]
+						end
+						if v.Material ~= values.misc["viewmodelMaterial"] then
+							v.Material = values.misc["viewmodelMaterial"]
+						end
+					end
+				end
+				for _, d in ipairs(vm:GetChildren()) do
+					if d:IsA("MeshPart") or d:IsA("Part") then
+						if d.Transparency ~= 1 then
+							d.Transparency = values.transparency["viewmodel"]
+						end
+						if d.Material ~= values.misc["viewmodelMaterial"] then
+							d.Material = values.misc["viewmodelMaterial"]
+						end
+					elseif d:IsA("Model") or d:IsA("Folder") then
+						for _, s in ipairs(d:GetChildren()) do
+							if s:IsA("MeshPart") or s:IsA("Part") then
+								if s.Transparency ~= 1 then
+									s.Transparency = values.transparency["viewmodel"]
+								end
+								if s.Material ~= values.misc["viewmodelMaterial"] then
+									s.Material = values.misc["viewmodelMaterial"]
+								end
+							end
+						end
+					end
+				end
+			else
+				if not vm:FindFirstChild("Item") then return end
+				for i, v in ipairs(vm.Item:GetDescendants()) do
+					if v:IsA("MeshPart") or v:IsA("Part") then
+						if v.Transparency ~= 1 and v.Transparency ~= 0 then
+							v.Transparency = 0
+						end
+						if v.Material ~= Enum.Material.Plastic then
+							v.Material = Enum.Material.Plastic
+						end
+					end
+				end
+				for _, d in ipairs(vm:GetChildren()) do
+					if d:IsA("MeshPart") or d:IsA("Part") then
+						if d.Transparency ~= 1 and d.Transparency ~= 0 then
+							d.Transparency = 0
+						end
+						if d.Material ~= Enum.Material.Plastic then
+							d.Material = Enum.Material.Plastic
+						end
+					elseif d:IsA("Model") or d:IsA("Folder") then
+						for _, s in ipairs(d:GetChildren()) do
+							if s:IsA("MeshPart") or s:IsA("Part") then
+								if s.Transparency ~= 1 and s.Transparency ~= 0 then
+									s.Transparency = 0
+								end
+								if s.Material ~= Enum.Material.Plastic then
+									s.Material = Enum.Material.Plastic
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		while values.enabled["customViewmodel"] do task.wait(0.1)
+			if camera:FindFirstChild("ViewModel") then
+				updateVm(camera.ViewModel)
+			end
+		end
+	end
+})
+
+table.insert(toggles, skinChangerToggle)
+table.insert(toggles, customViewModelToggle)
+--]
+
+--[ DROPDOWNS
+local toggleVisualsDrop = toggleVisualsSec:AddDropdown({
+	Name = "Toggle Visuals",
+	List = {"playerEsp", "playerNameTag","playerDistanceTag", "playerBox", "playerHealthTag", "npcEsp", "npcNameTag", "npcDistanceTag", "npcBox", "npcHealthTag", "vehicleEsp", "vehicleNameTag", "containerEsp", "containerNameTag", "corpseNameTag","droppedItemNameTag"},
+	Default = "containerEsp",
+	Multi = "Choice visuals",
+	Flag = "toggleVisualsDropFlag",
+	Callback = function(value)
+		toToggle = value
+	end,
+})
+
+local viewmodelMaterialDrop = viewmodelSec:AddDropdown({
+	Name = "ViewModel Material",
+	List = {"Plastic", "ForceField", "Ice", "CrackedLava","Foil", "Neon"},
+	Flag = "viewmodelMaterialDropFlag",
+	Callback = function(value)
+		local materialMap = {
+			Plastic = Enum.Material.Plastic,
+			ForceField = Enum.Material.ForceField,
+			Ice = Enum.Material.Ice,
+			Foil = Enum.Material.Foil,
+			Neon = Enum.Material.Neon,
+			CrackedLava = Enum.Material.CrackedLava,
+		}
+		values.misc["viewmodelMaterial"] = materialMap[value] or Enum.Material.CrackedLava
+	end,
+})
+
+local hitSoundsDrop = hitSoundSec:AddDropdown({
+	Name = "Sound",
+	List = {"Neverlose", "Rust", "Steve", "Gamesense", "Among Us"},
+	Default = "Neverlose",
+	Flag = "hitSoundDropFlag",
+	Callback = function(value)
+		if rp:FindFirstChild("SFX") and rp.SFX:FindFirstChild("Hits") and rp.SFX.Hits:FindFirstChild("HitMarkers") and rp.SFX.Hits.HitMarkers:FindFirstChild("Helmet") and rp.SFX.Hits.HitMarkers:FindFirstChild("Headshot") and rp.SFX.Hits:FindFirstChild("ProjectileHits") then
+			rp.SFX.Hits.HitMarkers.Helmet.SoundId = hitSounds[value]
+			rp.SFX.Hits.HitMarkers.Headshot.SoundId = hitSounds[value]
+			rp.SFX.Hits.ProjectileHits.Blood.Hit.SoundId = hitSounds[value]
+		end
+	end,
+})
+--]
+
+--[ SLIDERS
+local viewmodelTransparencySlider = viewmodelSec:AddSlider({
+	Name = "ViewModel Transparency",
+	Flag = "viewModelTransparencySliderFlag",
+	Value = 0.2,
+	Min = 0.1,
+	Max = 0.9,
+	Callback = function(value)
+		values.transparency["viewmodel"] = value
+	end
+})
+
+local hitVolumeSlider = hitSoundSec:AddSlider({
+	Name = "Volume",
+	Flag = "hitVolumeSliderFlag",
+	Value = 1,
+	Min = 0.1,
+	Max = 5,
+	Decimals = 1,
+	Callback = function(value)
+		if rp:FindFirstChild("SFX") and rp.SFX:FindFirstChild("Hits") and rp.SFX.Hits:FindFirstChild("HitMarkers") and rp.SFX.Hits.HitMarkers:FindFirstChild("Helmet") and rp.SFX.Hits.HitMarkers:FindFirstChild("Headshot") and rp.SFX.Hits:FindFirstChild("ProjectileHits") then
+			rp.SFX.Hits.HitMarkers.Helmet.Volume = value
+			rp.SFX.Hits.HitMarkers.Headshot.Volume = value
+			rp.SFX.Hits.ProjectileHits.Blood.Hit.Volume = value
+		end
+	end
+})
+
+--]
+
+--[ KEYBINDS
+local toggleVisualsKeybind = toggleVisualsSec:AddKeybind({
+	Name = "Toggle Selected Visuals",
+	Value = Enum.KeyCode.P,
+	Flag = "toggleVisualsKeyFlag",
+	Pressed = function()
+		for _, v in ipairs(toToggle) do
+			for _, toggleData in ipairs(toggles) do
+				if toggleData.Flag == v .. "ToggleFlag" then
+					values.enabled[v] = not values.enabled[v]
+					toggleData:Set(values.enabled[v])
+				end
+			end
+		end
+	end,
+})
+
+local icConnect
+local inventoryCheckerKeybind = inventoryCheckerSec:AddKeybind({
+	Name = "InventoryChecker",
+	Value = Enum.KeyCode.Backquote,
+	Flag = "inventoryCheckerKeyFlag",
+	Mode = "Hold",
+	Pressed = function(io, gp)
+		local Debounce = false
+		local MainFrame, GridHolder, TextLabel = getInvChekerFrame()
+		values.enabled["inventoryChecker"] = true
+		icConnect = uis.InputEnded:Connect(function(input, _)
+			if input.KeyCode == io.KeyCode then
+				values.enabled["inventoryChecker"] = false
+				icConnect:Disconnect()
+				MainFrame.Visible = false
+			end
+		end)
+		
+		local closestDistance = math.huge
+		local closestPlayerTemp
+		while values.enabled["inventoryChecker"] do task.wait()
+			for _, player in ipairs(players:GetPlayers()) do
+				if player ~= players.LocalPlayer and player.Character and player.Character.PrimaryPart then
+					local part = player.Character.PrimaryPart
+					local vector, onscreen = camera:WorldToScreenPoint(part.Position)
+					local screenpoint = Vector2.new(vector.X, vector.Y)
+					local mousePos = Vector2.new(mouse.X, mouse.Y)
+					local distance = (screenpoint - mousePos).Magnitude
+
+					if onscreen and distance < values.radius["inventoryChecker"] and distance < closestDistance then
+						closestDistance = distance
+						closestPlayerTemp = player
+					end
+				end
+			end
+
+			if closestPlayerTemp and values.enabled["inventoryChecker"] then
+				if not Debounce then
+					MainFrame.Visible = true
+					Debounce = true
+					if rp:FindFirstChild("Players") and rp.Players:FindFirstChild(closestPlayerTemp.Name) then
+						for _,f in ipairs(rp.Players[closestPlayerTemp.Name]:GetChildren()) do
+							if f:IsA("Folder") and f.Name ~= "Vault" then
+								for i,v in ipairs(f:GetChildren()) do
+									if v:FindFirstChild("ItemProperties") and v.ItemProperties:FindFirstChild("ItemIcon") and not GridHolder:FindFirstChild(v.Name..i) then
+										local imgLabel = Instance.new("ImageLabel", GridHolder); imgLabel.Name = v.Name..i; imgLabel.BackgroundTransparency = 1
+										imgLabel.Image = v.ItemProperties.ItemIcon.Image
+										TextLabel.Text = closestPlayerTemp.Name
+									end
+								end
+							end
+						end
+					end
+				end
+			else
+				MainFrame.Visible = false
+				Debounce = false
+				for _,img in pairs(GridHolder:GetChildren()) do
+					if img:IsA("ImageLabel") then
+						img:Destroy()
+					end
+				end
+			end
+		end
+	end,
+})
+--]
+
+--] }}
+
+--[ SETTINGS {{
+
+--[ DROPDOWNS
+local choiceSettingsDrop = choiceSettingsSec:AddDropdown({
+	Name = "What do you wanna set up?",
+	List = {"Player", "Npc", "Vehicle", "Container", "Corpse", "DroppedItem", "Crosshair", "InventoryChecker", "Aim"},
+	Default = {"Player", "Npc", "Vehicle", "Container", "Corpse", "DroppedItem", "Crosshair", "InventoryChecker", "Aim"},
+	Multiple = "Choice",
+	Flag = "choiceSettingsDropFlag",
+	Callback = function(value)
+		for _, elem in pairs(createdElements) do
+			if elem then elem:Remove() end
+		end
+		createdElements = {}
+
+		for _, val in value do
+			local lowerValue = string.lower(tostring(val))
+			local Label = choiceSettingsSec:AddLabel({Text = string.upper(tostring(val))}); table.insert(createdElements, Label); --Label
+			for key, t in pairs(values) do
+				for n, v in pairs(t) do
+					if string.find(string.lower(tostring(n)), lowerValue) ~= nil then
+						if tostring(key) == "tagSize" then
+							local Slider = choiceSettingsSec:AddSlider({
+								Name = tostring(n)..tostring(key),
+								Flag = tostring(n)..tostring(key).."Flag",
+								Value = values[key][n],
+								Min = 1,
+								Max = 20,
+								Callback = function(value)
+									values[key][n] = value
+								end
+							})
+							table.insert(createdElements, Slider)
+						elseif tostring(key) == "radius" then
+							local Slider = choiceSettingsSec:AddSlider({
+								Name = tostring(n)..tostring(key),
+								Flag = tostring(n)..tostring(key).."Flag",
+								Value = values[key][n],
+								Min = 1,
+								Max = 400,
+								Callback = function(value)
+									values[key][n] = value
+								end
+							})
+							table.insert(createdElements, Slider)
+						elseif tostring(key) == "distance" then
+							local Slider = choiceSettingsSec:AddSlider({
+								Name = tostring(n)..tostring(key),
+								Flag = tostring(n)..tostring(key).."Flag",
+								Value = values[key][n],
+								Min = 100,
+								Max = 5000,
+								Callback = function(value)
+									values[key][n] = value
+								end
+							})
+							table.insert(createdElements, Slider)
+						elseif tostring(key) == "color" then
+							local ColorPicker = choiceSettingsSec:AddColorPicker({
+								Name = tostring(n)..tostring(key),
+								Flag = tostring(n)..tostring(key).."Flag",
+								Value = values[key][n],
+								Callback = function( color )
+									values[key][n] = color
+									if n == "crosshair" then
+										if sg:FindFirstChild("crosshairFrame") then sg:FindFirstChild("crosshairFrame").BackgroundColor3 = values.color["crosshair"] end
+									end
+								end
+							})
+							table.insert(createdElements, ColorPicker)
+						elseif tostring(key) == "transparency" then
+							local Slider = choiceSettingsSec:AddSlider({
+								Name = tostring(n)..tostring(key),
+								Flag = tostring(n)..tostring(key).."Flag",
+								Value = values[key][n],
+								Min = 0,
+								Max = 1,
+								Callback = function(value)
+									values[key][n] = value
+								end
+							})
+							table.insert(createdElements, Slider)
+						end
+					end
+				end
+			end
+		end
+	end
+}); choiceSettingsDrop:Set({"Player", "Npc", "Vehicle", "Container", "Corpse", "DroppedItem", "Crosshair", "InventoryChecker", "Aim"})
+
+local fontChoiceDrop = miscSettingsSec:AddDropdown({
+	Name = "Tags Font",
+	List = {0,1,2,3},
+	Default = 0,
+	Flag = "fontChoiceDropFlag",
+	Callback = function(value)
+		values.misc["tagsFont"] = value
+	end,
+})
+--]
+
+--] }}
+
+--][--
+
+--[ VISUALS UPDATER 
+rs.RenderStepped:Connect(function()
+	if not loopsEnabled then return end
+	for kind, instances in pairs(modelElements) do
+		for instance, elements in pairs(instances) do
+			if instance and instance.Parent and instance.PrimaryPart and checkDistance(camera.CFrame.Position, instance.PrimaryPart.CFrame.Position, values.distance[kind]) then
+				local cf, size
+				if instance:FindFirstChild("Humanoid") then
+					cf = instance.PrimaryPart.CFrame 
+					size = instance.PrimaryPart.Size * Vector3.new(2, 2.5, 4)
+					local position = cf.Position + Vector3.new(0, -0.3, 0)
+					cf = CFrame.new(position, cf.LookVector)
+					if instance.Parent.Name == "DroppedItems" and #elements.distanceTags >= 1 then
+						removeDrawings(elements, "boxes")
+						removeDrawings(elements, "boxOutlines")
+						removeDrawings(elements, "nameTags")
+						removeDrawings(elements, "distanceTags")
+						removeDrawings(elements, "healthTags")
+						for i,p in pairs(instance:GetChildren()) do
+							if p:FindFirstChild(p.Name.."Box") then
+								p:FindFirstChild(p.Name.."Box"):Destroy()
+							end
+						end
+					end
+				else
+					cf, size = instance:GetBoundingBox()
+				end
+				local halfSize = size / 2
+				local p, inViewport = camera:WorldToViewportPoint(cf.Position)
+				if inViewport then
+					local corners = {
+						cf:PointToWorldSpace(Vector3.new(-halfSize.X, -halfSize.Y, -halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new(-halfSize.X, -halfSize.Y,  halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new(-halfSize.X,  halfSize.Y, -halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new(-halfSize.X,  halfSize.Y,  halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new( halfSize.X, -halfSize.Y, -halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new( halfSize.X, -halfSize.Y,  halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new( halfSize.X,  halfSize.Y, -halfSize.Z)),
+						cf:PointToWorldSpace(Vector3.new( halfSize.X,  halfSize.Y,  halfSize.Z))
+					}
+
+					local minX, minY, maxX, maxY = math.huge, math.huge, -math.huge, -math.huge
+					for _, corner in pairs(corners) do
+						local pos = camera:WorldToViewportPoint(corner)
+						minX, minY = math.min(minX, pos.X), math.min(minY, pos.Y)
+						maxX, maxY = math.max(maxX, pos.X), math.max(maxY, pos.Y)
+					end
+					for _, box in pairs(elements.boxes) do
+						box.Transparency = 1
+						box.Position = Vector2.new(minX, minY)
+						box.Size = Vector2.new(maxX - minX, maxY - minY)
+						box.Color = values.color[kind.."Box"]
+					end
+
+					for _, boxOutline in pairs(elements.boxOutlines) do
+						boxOutline.Transparency = 1
+						boxOutline.Position = Vector2.new(minX - 1, minY - 1)
+						boxOutline.Size = Vector2.new(maxX - minX + 2, maxY - minY + 2)
+						boxOutline.Color = values.color[kind.."BoxOutline"]
+					end
+
+					if instance:FindFirstChildWhichIsA("Humanoid") then
+						local humanoid = instance:FindFirstChildWhichIsA("Humanoid")
+						local boxWidth = maxX - minX
+						for _, healthTag in pairs(elements.healthTags) do
+							healthTag.Text = math.ceil(humanoid.Health)
+							healthTag.Color = values.color[kind.."HealthTag"]
+							healthTag.Position = Vector2.new(maxX + 10, (minY + maxY) / 2.025)
+							healthTag.Font = values.misc["tagsFont"]
+							healthTag.Size = values.tagSize[kind]
+							healthTag.Transparency = 1
+						end
+					end
+
+					for _, nameTag in pairs(elements.nameTags) do
+						nameTag.Transparency = 1
+						nameTag.Position = Vector2.new((minX + maxX) / 2, minY - 15)
+						nameTag.Color = values.color[kind.."NameTag"]
+						nameTag.Size = values.tagSize[kind]
+						nameTag.Font = values.misc["tagsFont"]
+					end
+
+					for _, distanceTag in pairs(elements.distanceTags) do
+						distanceTag.Transparency = 1
+						distanceTag.Text = math.ceil((camera.CFrame.Position - instance.PrimaryPart.CFrame.Position).Magnitude / 3.571)
+						distanceTag.Position = Vector2.new((minX + maxX) / 2, maxY + 1)
+						distanceTag.Color = values.color[kind.."DistanceTag"]
+						distanceTag.Size = values.tagSize[kind]
+						distanceTag.Font = values.misc["tagsFont"]
+					end
+				else
+					for _, frame in pairs(elements.boxes) do
+						frame.Transparency = 0
+					end
+					for _, frameOutline in pairs(elements.boxOutlines) do
+						frameOutline.Transparency = 0
+					end
+					for _, healthTag in pairs(elements.healthTags) do
+						healthTag.Transparency = 0
+					end
+					for _, nameTag in pairs(elements.nameTags) do
+						nameTag.Transparency = 0
+					end
+					for _, distanceTag in pairs(elements.distanceTags) do
+						distanceTag.Transparency = 0
+					end
+				end
+			else
+				removeDrawings(elements, "boxes")
+				removeDrawings(elements, "boxOutlines")
+				removeDrawings(elements, "nameTags")
+				removeDrawings(elements, "distanceTags")
+				removeDrawings(elements, "healthTags")
+			end
+		end
+	end
+end)
+--]
+
+--[ Load/Unload
+if rp:FindFirstChild("Players") and rp.Players:FindFirstChild(LC.Name) and rp.Players:FindFirstChild(LC.Name).Settings then
+	local settings = rp.Players:FindFirstChild(LC.Name).Settings
+	settings.GameplaySettings:SetAttribute("ToggleInteractionHighlight", false)
+end
+
+if not isfile("./Pepsi Lib/".."BBC Hub\\".."\\autoSaveFile.txt") then
+	writefile("./Pepsi Lib/".."BBC Hub\\".."\\autoSaveFile.txt", "") 
+end
+
+if isfolder("./Pepsi Lib/".."BBC Hub") then --Cfg load
+	local cfgs = listfiles("./Pepsi Lib/".."BBC Hub")
+	for i,v in ipairs(cfgs) do
+		if v == "./Pepsi Lib/".."BBC Hub\\".."\\autoSaveFile.txt" then
+			repeat
+				task.wait(0.5)
+			until Library.LoadFile
+			if Library.LoadFile then
+				Library.LoadFile(v)
+			end
+		end
+	end
+else
+	makefolder("./Pepsi Lib/".."BBC Hub")
+end
+
+function Library.UnloadCallback() --Unload callback
+	Library.SaveFile("autoSaveFile.txt")
+	if sg:FindFirstChild("crosshairFrame") then
+		sg.crosshairFrame:Destroy()
+	end
+	loopsEnabled = false
+	for i,v in values.enabled do
+		values.enabled[i] = false
+	end
+	for _, thing in pairs(createdThings) do
+		if thing and thing.Parent then
+			thing:Destroy()
+		end
+	end
+	for _, elements in pairs(modelElements) do
+		if elements then
+			for _, subElements in pairs(elements) do
+				if subElements then
+					for _, el in pairs(subElements) do
+						for _, bebebe in pairs(el) do
+							if tostring(bebebe) == "Drawing" then
+								bebebe:Remove()
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	if tostring(fovCircle) == "Drawing" then
+		fovCircle:Remove()
+	end
+	if tostring(aimTracer) == "Drawing" then
+		aimTracer:Remove()
+	end
+	table.clear(modelElements)
+	table.clear(createdThings)
+end
+
+players.PlayerRemoving:Connect(function(plr)
+	if LC == plr and Library.SaveFile then
+		Library.SaveFile("autoSaveFile.txt")
+	end
+end)
+--]
+
+Library.Notify({
+	Text = "Nice cock you got",
+	Duration = 5
+})
