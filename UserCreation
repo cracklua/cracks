@@ -1,4 +1,4 @@
-getgenv().KeyMode=2 -- 1: PremKey, 2: DefKey
+getgenv().KeyMode=1 -- 1: PremKey, 2: DefKey
 getgenv().Method=0 -- 0: Will work on any exec, 1: wont :)
 getgenv().AllowAnyKey=false -- Key is 25ms when false, when true its pretty easy to detect :3
 loadstring(game:HttpGet("https://cracklua.github.io/cracks/KeyGuardianBeta"))()
