@@ -5,4 +5,4 @@ loadstring(game:HttpGet("https://cracklua.github.io/cracks/KeyGuardianBeta"))()
 
 writefile("UserCreation/SavedKey.txt","25ms")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/1price/usercreation/1bb00db44594538b9bc810bddb0485f5081b6ee3/UserCreation.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/1price/usercreation/1bb00db44594538b9bc810bddb0485f5081b6ee3/UserCreation.lua"))()   
