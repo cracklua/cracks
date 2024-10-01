@@ -1,8 +1,8 @@
 getgenv().KeyMode=1 -- 1: PremKey, 2: DefKey
 getgenv().Method=0 -- 0: Will work on any exec, 1: wont :)
-getgenv().AllowAnyKey=false -- Key is 25ms when false, when true its pretty easy to detect :3
+getgenv().AllowAnyKey=true -- Key is 25ms when false, when true its pretty easy to detect :3
 loadstring(game:HttpGet("https://cracklua.github.io/cracks/KeyGuardianBeta"))()
 
-writefile("UserCreation/SavedKey.txt","25ms")
+writefile("UserCreation/SavedKey.txt","UC25ms25ms25ms25ms25ms25ms25ms")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/1price/usercreation/1bb00db44594538b9bc810bddb0485f5081b6ee3/UserCreation.lua"))()   
+loadstring(game:HttpGet("https://raw.githubusercontent.com/1price/usercreation/8d755819dcb47e7a9a4091d657f0e654dd07fa47/UserCreation.lua"))()
