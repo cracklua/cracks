@@ -1,4 +1,4 @@
-writefile("dkhub_SavedKey.txt","25ms")
-writefile("dkhub_key.txt","25ms")
+writefile("dkhub_SavedKey.txt","97cd1e13ca06d6abca3b1e36a41a57da")
+writefile("dkhub_key.txt","97cd1e13ca06d6abca3b1e36a41a57da")
 loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxR"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ByNami/dkhub/main/Script", true))()
