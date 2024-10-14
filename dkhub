@@ -3,5 +3,5 @@ local usekey=(function(...)("CrackGuard by 25ms"):gsub(".+",function(K)_cpARIW=K
 writefile("dkhub_SavedKey.txt",usekey)
 writefile("dkhub_key.txt",usekey)
 writefile("NamiHub_SavedKey.txt",usekey)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxR"))(usekey)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/cracklua/cracks/m/keyrblxR",true))(usekey)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ByNami/dkhub/main/Script", true))()
