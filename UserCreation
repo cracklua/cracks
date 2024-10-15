@@ -3,6 +3,6 @@ for i=1,30 do
     fluent:Notify({
         Title="PATCHED discord.gg/backdoors",
         Content = "Chat bypassers are currently patched, wait for an update of UserCreation",
-        Duration = 15
+        Duration = 20
     })
 end
